@@ -29,23 +29,23 @@ export function ConfirmDialog({ isOpen, title, description, onConfirm, onCancel,
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={isLoading ? undefined : onCancel} />
       
-      <div className="relative z-50 w-full max-w-lg transform overflow-hidden rounded-lg bg-white p-6 text-left align-middle shadow-xl transition-all m-4">
+      <div className="relative z-50 w-full max-w-lg transform overflow-hidden rounded-lg bg-card p-6 text-left align-middle shadow-xl transition-all m-4 border border-border">
         <button
           onClick={isLoading ? undefined : onCancel}
-          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:pointer-events-none"
+          className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none text-muted-foreground"
         >
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </button>
 
         <div className="flex gap-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 sm:h-12 sm:w-12">
-            <AlertTriangle className="h-5 w-5 text-red-600" aria-hidden="true" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20 sm:h-12 sm:w-12">
+            <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" aria-hidden="true" />
           </div>
           <div className="mt-1">
-            <h3 className="text-lg font-semibold leading-6 text-gray-900">{title}</h3>
+            <h3 className="text-lg font-semibold leading-6 text-foreground font-heading">{title}</h3>
             <div className="mt-2">
-              <p className="text-sm text-gray-500">{description}</p>
+              <p className="text-sm text-muted-foreground">{description}</p>
             </div>
           </div>
         </div>
@@ -53,7 +53,7 @@ export function ConfirmDialog({ isOpen, title, description, onConfirm, onCancel,
         <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <button
             type="button"
-            className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto disabled:opacity-50"
+            className="inline-flex w-full justify-center rounded-md bg-card px-3 py-2 text-sm font-semibold text-foreground shadow-sm ring-1 ring-inset ring-border hover:bg-accent sm:mt-0 sm:w-auto disabled:opacity-50"
             onClick={onCancel}
             disabled={isLoading}
           >

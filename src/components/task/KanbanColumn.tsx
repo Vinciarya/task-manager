@@ -45,14 +45,14 @@ export function KanbanColumn({
 
   return (
     <div 
-      className="flex flex-col bg-gray-100 rounded-xl w-80 shrink-0 max-h-full"
+      className="flex flex-col bg-muted/40 dark:bg-neutral-900/40 rounded-xl w-80 shrink-0 max-h-full border border-border/50"
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      <div className="p-4 flex items-center justify-between border-b border-gray-200 shrink-0">
-        <h3 className="font-semibold text-gray-700 flex items-center gap-2">
+      <div className="p-4 flex items-center justify-between border-b border-border shrink-0">
+        <h3 className="font-bold text-foreground flex items-center gap-2 font-heading text-sm uppercase tracking-wider">
           {title}
-          <span className="bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full text-xs font-medium">
+          <span className="bg-muted text-muted-foreground px-2 py-0.5 rounded-full text-[10px] font-bold">
             {tasks.length}
           </span>
         </h3>
@@ -76,7 +76,7 @@ export function KanbanColumn({
           </div>
         ))}
         {tasks.length === 0 && (
-          <div className="h-20 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg text-gray-400 text-sm">
+          <div className="h-24 flex items-center justify-center border-2 border-dashed border-border rounded-xl text-muted-foreground text-xs font-medium bg-muted/20">
             Drop tasks here
           </div>
         )}

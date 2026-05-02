@@ -68,7 +68,7 @@ export function TaskCard({ task, onEdit, onDelete, userRoleInProject, onClick, c
             <div className="flex items-center gap-2 flex-wrap">
               <PriorityBadge priority={task.priority} />
               {isOverdue && (
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-800 tracking-tight">
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-100 dark:bg-rose-500/20 text-rose-800 dark:text-rose-300 tracking-tight">
                   Overdue
                 </span>
               )}
@@ -79,7 +79,7 @@ export function TaskCard({ task, onEdit, onDelete, userRoleInProject, onClick, c
                 <DropdownMenuTrigger asChild>
                   <button
                     onClick={(e) => e.stopPropagation()}
-                    className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity outline-none"
+                    className="p-1 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 rounded-full hover:bg-neutral-100/80 dark:hover:bg-neutral-800/80 opacity-0 group-hover:opacity-100 transition-opacity outline-none"
                   >
                     <MoreVertical className="h-4 w-4" />
                   </button>
@@ -98,28 +98,28 @@ export function TaskCard({ task, onEdit, onDelete, userRoleInProject, onClick, c
 
           {/* Title + description */}
           <div>
-            <h4 className="text-base font-bold text-gray-900 leading-tight mb-1 tracking-tight">{task.title}</h4>
+            <h4 className="text-base font-bold text-neutral-900 dark:text-white leading-tight mb-1 tracking-tight">{task.title}</h4>
             {task.description && (
-              <p className="text-xs text-gray-500 line-clamp-2">{task.description}</p>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 line-clamp-2">{task.description}</p>
             )}
           </div>
         </CardContent>
 
-        <CardFooter className="flex items-center justify-between border-t border-gray-100 text-xs text-gray-500">
+        <CardFooter className="flex items-center justify-between border-t border-neutral-100 dark:border-neutral-800 text-xs text-neutral-500 dark:text-neutral-400">
           {task.assignedToId ? (
             <div className="flex items-center gap-1.5" title="Assigned to">
-              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-gray-200">
-                <span className="text-[10px] font-medium leading-none text-gray-600">
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-indigo-100/50 dark:bg-indigo-500/20">
+                <span className="text-[10px] font-medium leading-none text-indigo-600 dark:text-indigo-400">
                   <User className="h-3 w-3" />
                 </span>
               </span>
             </div>
           ) : (
-            <div className="text-gray-400 italic">Unassigned</div>
+            <div className="text-neutral-400 dark:text-neutral-500 italic">Unassigned</div>
           )}
 
           {task.dueDate && (
-            <div className={cn('flex items-center gap-1', isOverdue && 'text-red-600 font-medium')}>
+            <div className={cn('flex items-center gap-1', isOverdue && 'text-rose-600 dark:text-rose-400 font-medium')}>
               <Calendar className="h-3 w-3" />
               {new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
             </div>

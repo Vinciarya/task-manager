@@ -53,7 +53,7 @@ export default function TasksPage() {
   return (
     <PageWrapper>
       <div className="mb-10">
-        <h1 className="text-3xl font-bold leading-7 text-gray-900 sm:truncate sm:text-4xl sm:tracking-tight">
+        <h1 className="text-3xl font-bold leading-7 text-gray-900 dark:text-white sm:truncate sm:text-4xl sm:tracking-tight">
           All My Tasks
         </h1>
       </div>
@@ -71,32 +71,32 @@ export default function TasksPage() {
           icon={<CheckSquare className="h-12 w-12" />}
         />
       ) : (
-        <div className="bg-white shadow-sm ring-1 ring-gray-200 sm:rounded-lg">
-          <table className="min-w-full divide-y divide-gray-300">
-            <thead className="bg-gray-50">
+        <div className="bg-white dark:bg-neutral-900 shadow-sm ring-1 ring-gray-200 dark:ring-neutral-800 sm:rounded-lg">
+          <table className="min-w-full divide-y divide-gray-300 dark:divide-neutral-800">
+            <thead className="bg-gray-50 dark:bg-neutral-800/50">
               <tr>
-                <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Title</th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Project</th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Priority</th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Due Date</th>
+                <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-white sm:pl-6">Title</th>
+                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">Project</th>
+                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">Status</th>
+                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">Priority</th>
+                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">Due Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
+            <tbody className="divide-y divide-gray-200 dark:divide-neutral-800 bg-card">
               {tasks.map((task) => {
                 const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== TaskStatus.DONE;
                 
                 return (
                   <tr key={task.id}>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 max-w-[200px] truncate">
+                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-white sm:pl-6 max-w-[200px] truncate">
                       {task.title}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-neutral-400">
                       <Link href={`/projects/${task.projectId}`} className="text-indigo-600 hover:underline">
                         View Project
                       </Link>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-neutral-400">
                       <Select
                         value={task.status}
                         onValueChange={(v) => handleStatusChange(task.id, v as TaskStatus)}
@@ -112,10 +112,10 @@ export default function TasksPage() {
                         </SelectContent>
                       </Select>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-neutral-400">
                       <PriorityBadge priority={task.priority} />
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-neutral-400">
                       {task.dueDate ? (
                         <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
                           {new Date(task.dueDate).toLocaleDateString()}

@@ -81,8 +81,8 @@ function ActiveSidebarLink({
       className={cn(
         'rounded-md px-2 transition-colors',
         isActive
-          ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300'
-          : 'text-neutral-700 hover:bg-neutral-200/60 dark:text-neutral-200 dark:hover:bg-neutral-700/50',
+          ? 'bg-blue-600/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 font-semibold'
+          : 'text-neutral-600 hover:bg-slate-200/60 dark:text-neutral-400 dark:hover:bg-neutral-800/50',
       )}
     />
   );
@@ -106,7 +106,7 @@ export function Sidebar() {
 
   return (
     <AcetSidebar open={open} setOpen={setOpen}>
-      <SidebarBody className="h-full justify-between gap-10 border-r border-neutral-200 bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-800">
+      <SidebarBody className="bg-slate-50/50 dark:bg-neutral-950 backdrop-blur-xl border-r border-slate-200/50 dark:border-neutral-800">
         {/* Top section */}
         <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
           <Logo />
@@ -157,7 +157,7 @@ export function Sidebar() {
             {/* Sign out */}
             <button
               onClick={() => signOut({ callbackUrl: '/login' })}
-              className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-neutral-700 transition-colors hover:bg-neutral-200/60 dark:text-neutral-200 dark:hover:bg-neutral-700/50"
+              className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-neutral-600 hover:bg-slate-200/60 dark:text-neutral-400 dark:hover:bg-neutral-800/50"
             >
               <LogOut className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
               <motion.span

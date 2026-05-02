@@ -36,9 +36,9 @@ export function TaskFilters({ filters, onChange, projectMembers }: TaskFiltersPr
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-md p-5 rounded-xl shadow-sm border border-gray-100 flex flex-wrap gap-6 items-end">
+    <div className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md p-5 rounded-xl shadow-sm border border-gray-100 dark:border-neutral-800 flex flex-wrap gap-6 items-end">
       <div className="w-full sm:w-auto flex-1 min-w-[180px]">
-        <Label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-1.5">
+        <Label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-neutral-400 mb-2 flex items-center gap-1.5">
           <Filter className="h-3 w-3" /> Status
         </Label>
         <Select
@@ -58,7 +58,7 @@ export function TaskFilters({ filters, onChange, projectMembers }: TaskFiltersPr
       </div>
 
       <div className="w-full sm:w-auto flex-1 min-w-[180px]">
-        <Label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-1.5">
+        <Label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-neutral-400 mb-2 flex items-center gap-1.5">
           <AlertCircle className="h-3 w-3" /> Priority
         </Label>
         <Select
@@ -79,7 +79,7 @@ export function TaskFilters({ filters, onChange, projectMembers }: TaskFiltersPr
 
       {projectMembers && (
         <div className="w-full sm:w-auto flex-1 min-w-[180px]">
-          <Label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-1.5">
+          <Label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-neutral-400 mb-2 flex items-center gap-1.5">
             <Users className="h-3 w-3" /> Assignee
           </Label>
           <Select
@@ -101,7 +101,7 @@ export function TaskFilters({ filters, onChange, projectMembers }: TaskFiltersPr
         </div>
       )}
 
-      <div className="w-full sm:w-auto flex items-center gap-3 h-9 px-4 rounded-md border border-gray-100 bg-gray-50/50">
+      <div className="w-full sm:w-auto flex items-center gap-3 h-9 px-4 rounded-md border border-gray-100 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-800/30">
         <Switch
           id="overdue-filter"
           checked={filters.overdue || false}
@@ -109,9 +109,9 @@ export function TaskFilters({ filters, onChange, projectMembers }: TaskFiltersPr
         />
         <Label 
           htmlFor="overdue-filter" 
-          className="text-sm font-bold tracking-tight text-gray-700 cursor-pointer select-none flex items-center gap-1.5"
+          className="text-sm font-bold tracking-tight text-gray-700 dark:text-neutral-300 cursor-pointer select-none flex items-center gap-1.5"
         >
-          <CalendarDays className={cn("h-4 w-4", filters.overdue ? "text-red-500" : "text-gray-400")} />
+          <CalendarDays className={cn("h-4 w-4", filters.overdue ? "text-red-500" : "text-gray-400 dark:text-neutral-400")} />
           Overdue Only
         </Label>
       </div>

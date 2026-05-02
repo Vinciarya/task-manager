@@ -54,8 +54,8 @@ const statCards = (stats: DashboardStats) => [
     icon: <AlertTriangle className="h-6 w-6 text-white" aria-hidden="true" />,
     bg: 'bg-red-500',
     accent: 'ring-1 ring-red-500/20',
-    valueClass: 'text-red-600',
-    labelClass: 'text-red-600',
+    valueClass: 'text-red-600 dark:text-red-400',
+    labelClass: 'text-red-600 dark:text-red-400',
   },
   {
     label: 'Due Today',
@@ -98,7 +98,7 @@ export default function DashboardPage() {
     return (
       <PageWrapper>
         <div className="text-center py-24">
-          <p className="text-gray-500">Failed to load dashboard statistics. Please try refreshing.</p>
+          <p className="text-gray-500 dark:text-neutral-400">Failed to load dashboard statistics. Please try refreshing.</p>
         </div>
       </PageWrapper>
     );
@@ -109,7 +109,7 @@ export default function DashboardPage() {
   return (
     <PageWrapper>
       <div className="mb-10">
-        <h1 className="text-3xl font-bold leading-7 text-gray-900 sm:truncate sm:text-4xl sm:tracking-tight">
+        <h1 className="text-3xl font-bold leading-7 text-gray-900 dark:text-white sm:truncate sm:text-4xl sm:tracking-tight">
           Dashboard
         </h1>
       </div>
@@ -123,12 +123,12 @@ export default function DashboardPage() {
                 <div className={`absolute rounded-xl ${s.bg} p-3.5 shadow-lg`}>
                   {s.icon}
                 </div>
-                <p className={`ml-20 truncate text-sm font-bold uppercase tracking-wider ${s.labelClass ?? 'text-gray-500'}`}>
+                <p className={`ml-20 truncate text-sm font-bold uppercase tracking-wider ${s.labelClass ?? 'text-gray-500 dark:text-neutral-400'}`}>
                   {s.label}
                 </p>
               </dt>
               <dd className="ml-20 flex items-baseline">
-                <p className={`text-3xl font-bold tracking-tight ${s.valueClass ?? 'text-gray-900'}`}>
+                <p className={`text-3xl font-bold tracking-tight ${s.valueClass ?? 'text-gray-900 dark:text-white'}`}>
                   {s.value}
                 </p>
               </dd>
@@ -151,8 +151,8 @@ export default function DashboardPage() {
               { label: 'Done', key: TaskStatus.DONE, color: 'bg-green-500' },
             ].map(({ label, key, color }) => (
               <div key={key} className="flex items-center gap-4">
-                <span className="w-24 text-sm text-gray-600">{label}</span>
-                <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                <span className="w-24 text-sm text-gray-600 dark:text-neutral-400">{label}</span>
+                <div className="flex-1 bg-gray-100 dark:bg-neutral-800 rounded-full h-4 overflow-hidden">
                   <div
                     className={`${color} h-full`}
                     style={{ width: `${((stats.byStatus?.[key] ?? 0) / (stats.totalTasks || 1)) * 100}%` }}
@@ -166,7 +166,7 @@ export default function DashboardPage() {
 
         {/* Recent tasks */}
         <Card className="overflow-hidden flex flex-col">
-          <CardHeader className="flex flex-row items-center justify-between border-b border-gray-200">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-gray-200 dark:border-neutral-800">
             <CardTitle>Recent Tasks</CardTitle>
             <Link href="/tasks" className="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
               View all
@@ -174,13 +174,13 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="flex-1 overflow-y-auto p-0">
             {tasks.length > 0 ? (
-              <ul className="divide-y divide-gray-200">
+              <ul className="divide-y divide-gray-200 dark:divide-neutral-800">
                 {tasks.slice(0, 5).map((task) => (
-                  <li key={task.id} className="p-4 hover:bg-gray-50">
+                  <li key={task.id} className="p-4 hover:bg-accent transition-colors">
                     <Link href={`/projects/${task.projectId}`} className="block">
-                      <p className="text-sm font-medium text-gray-900 truncate">{task.title}</p>
-                      <div className="mt-1 flex items-center justify-between text-xs text-gray-500">
-                        <span className="bg-gray-100 px-2 py-0.5 rounded">{task.status}</span>
+                      <p className="text-sm font-bold text-foreground truncate tracking-tight">{task.title}</p>
+                      <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
+                        <span className="bg-muted px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">{task.status}</span>
                         {task.dueDate && <span>Due {new Date(task.dueDate).toLocaleDateString()}</span>}
                       </div>
                     </Link>
@@ -188,7 +188,7 @@ export default function DashboardPage() {
                 ))}
               </ul>
             ) : (
-              <div className="p-6 text-center text-sm text-gray-500">No tasks assigned to you.</div>
+              <div className="p-6 text-center text-sm text-gray-500 dark:text-neutral-400">No tasks assigned to you.</div>
             )}
           </CardContent>
         </Card>

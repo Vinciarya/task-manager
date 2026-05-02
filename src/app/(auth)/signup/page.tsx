@@ -66,26 +66,26 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-gray-50">
+    <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8 bg-background">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center text-indigo-600">
+        <div className="flex justify-center text-indigo-600 dark:text-indigo-400">
           <CheckSquare className="h-12 w-12" />
         </div>
-        <h2 className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+        <h2 className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-foreground">
           Create your account
         </h2>
       </div>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md bg-white px-6 py-8 shadow sm:rounded-lg sm:px-10">
+      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md bg-card px-6 py-8 shadow sm:rounded-lg sm:px-10 border border-border">
         <form className="space-y-6" onSubmit={handleSubmit}>
           {generalError && (
-            <div className="p-3 bg-red-50 text-red-700 text-sm rounded-md border border-red-200 text-center">
+            <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm rounded-md border border-red-200 dark:border-red-800 text-center">
               {generalError}
             </div>
           )}
 
           <div>
-            <label htmlFor="name" className="block text-sm font-medium leading-6 text-gray-900">
+            <label htmlFor="name" className="block text-sm font-medium leading-6 text-foreground">
               Full Name
             </label>
             <div className="mt-2">
@@ -97,17 +97,17 @@ export default function SignupPage() {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border border-border bg-card py-1.5 px-3 text-foreground shadow-sm ring-1 ring-inset ring-transparent placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
                 disabled={isLoading}
               />
               {validationErrors.name && (
-                <p className="mt-1 text-sm text-red-600">{validationErrors.name[0]}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.name[0]}</p>
               )}
             </div>
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+            <label htmlFor="email" className="block text-sm font-medium leading-6 text-foreground">
               Email address
             </label>
             <div className="mt-2">
@@ -119,17 +119,17 @@ export default function SignupPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border border-border bg-card py-1.5 px-3 text-foreground shadow-sm ring-1 ring-inset ring-transparent placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
                 disabled={isLoading}
               />
               {validationErrors.email && (
-                <p className="mt-1 text-sm text-red-600">{validationErrors.email[0]}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.email[0]}</p>
               )}
             </div>
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+            <label htmlFor="password" className="block text-sm font-medium leading-6 text-foreground">
               Password
             </label>
             <div className="mt-2">
@@ -141,7 +141,7 @@ export default function SignupPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border border-border bg-card py-1.5 px-3 text-foreground shadow-sm ring-1 ring-inset ring-transparent placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
                 disabled={isLoading}
               />
               {password.length > 0 && (
@@ -149,23 +149,23 @@ export default function SignupPage() {
                   {[1, 2, 3, 4].map((i) => (
                     <div 
                       key={i} 
-                      className={`flex-1 rounded-full ${i <= passwordStrength ? strengthColor : 'bg-gray-200'}`}
+                      className={`flex-1 rounded-full ${i <= passwordStrength ? strengthColor : 'bg-muted'}`}
                     />
                   ))}
                 </div>
               )}
               {validationErrors.password && (
-                <p className="mt-1 text-sm text-red-600">{validationErrors.password[0]}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.password[0]}</p>
               )}
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium leading-6 text-gray-900 mb-2">
+            <label className="block text-sm font-medium leading-6 text-foreground mb-2">
               Role
             </label>
             <div className="grid grid-cols-2 gap-3">
-              <label className={`flex cursor-pointer items-center justify-center rounded-md border px-3 py-2 text-sm font-semibold uppercase sm:flex-1 ${role === Role.MEMBER ? 'bg-indigo-600 text-white border-transparent hover:bg-indigo-700' : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'}`}>
+              <label className={`flex cursor-pointer items-center justify-center rounded-md border px-3 py-2 text-sm font-semibold uppercase sm:flex-1 ${role === Role.MEMBER ? 'bg-indigo-600 text-white border-transparent hover:bg-indigo-700' : 'bg-card text-foreground border-border hover:bg-accent'}`}>
                 <input
                   type="radio"
                   name="role"
@@ -177,7 +177,7 @@ export default function SignupPage() {
                 />
                 Member
               </label>
-              <label className={`flex cursor-pointer items-center justify-center rounded-md border px-3 py-2 text-sm font-semibold uppercase sm:flex-1 ${role === Role.ADMIN ? 'bg-indigo-600 text-white border-transparent hover:bg-indigo-700' : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'}`}>
+              <label className={`flex cursor-pointer items-center justify-center rounded-md border px-3 py-2 text-sm font-semibold uppercase sm:flex-1 ${role === Role.ADMIN ? 'bg-indigo-600 text-white border-transparent hover:bg-indigo-700' : 'bg-card text-foreground border-border hover:bg-accent'}`}>
                 <input
                   type="radio"
                   name="role"
@@ -204,9 +204,9 @@ export default function SignupPage() {
           </div>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-500">
+        <div className="mt-6 text-center text-sm text-muted-foreground">
           Already have an account?{' '}
-          <Link href="/login" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+          <Link href="/login" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
             Sign in instead
           </Link>
         </div>

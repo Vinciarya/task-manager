@@ -110,9 +110,6 @@
 .titillium-web-semibold-italic { font-family: "Titillium Web", sans-serif; font-weight: 600; font-style: italic; }
 .titillium-web-bold-italic { font-family: "Titillium Web", sans-serif; font-weight: 700; font-style: italic; }
 
-input, textarea, select {
-  color: #000000 !important;
-}
 
 :root {
   --background: oklch(1 0 0);

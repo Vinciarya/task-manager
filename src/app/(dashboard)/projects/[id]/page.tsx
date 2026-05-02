@@ -105,30 +105,30 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     <PageWrapper>
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">{project.name}</h1>
-          <p className="mt-2 text-gray-500 max-w-2xl">{project.description}</p>
+          <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl font-heading">{project.name}</h1>
+          <p className="mt-2 text-muted-foreground max-w-2xl">{project.description}</p>
         </div>
         
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowMembers(!showMembers)}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-foreground bg-card border border-border rounded-md hover:bg-accent transition-colors"
           >
             <div className="flex -space-x-2">
               {project.members.slice(0, 3).map((m) => (
-                <div key={m.userId} className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-500 ring-2 ring-white">
+                <div key={m.userId} className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-500 ring-2 ring-card">
                   <span className="text-[10px] font-medium leading-none text-white">
                     {m.user.name?.[0]?.toUpperCase() || m.user.email[0].toUpperCase()}
                   </span>
                 </div>
               ))}
               {project.members.length > 3 && (
-                <div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 ring-2 ring-white">
-                  <span className="text-[10px] font-medium leading-none text-gray-500">+{project.members.length - 3}</span>
+                <div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-muted ring-2 ring-card">
+                  <span className="text-[10px] font-medium leading-none text-muted-foreground">+{project.members.length - 3}</span>
                 </div>
               )}
             </div>
-            <Users className="h-4 w-4 ml-1 text-gray-400" />
+            <Users className="h-4 w-4 ml-1 text-muted-foreground" />
           </button>
           
           <button

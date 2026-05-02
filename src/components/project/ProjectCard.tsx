@@ -49,13 +49,13 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
           {/* Title row + menu */}
           <div className="flex justify-between items-start mb-2 relative">
             <Link href={`/projects/${project.id}`} className="hover:underline flex-1">
-              <h3 className="text-xl font-bold text-gray-900 truncate tracking-tight font-heading">{project.name}</h3>
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-white truncate tracking-tight font-heading">{project.name}</h3>
             </Link>
 
             {isAdmin && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors outline-none">
+                  <button className="p-1 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-300 rounded-full hover:bg-neutral-100/80 dark:bg-neutral-800/80 transition-colors outline-none">
                     <MoreVertical className="h-5 w-5" />
                   </button>
                 </DropdownMenuTrigger>
@@ -71,21 +71,21 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
             )}
           </div>
 
-          <p className="text-sm text-gray-500 mb-6 line-clamp-2 flex-1">
+          <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-6 line-clamp-2 flex-1">
             {project.description || 'No description provided.'}
           </p>
 
           {/* Progress */}
           <div className="mt-auto">
-            <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+            <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 mb-1">
               <span>{project.taskCounts.DONE}/{totalTasks} tasks done</span>
               <span>{progress}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-              <div className="bg-indigo-600 h-2 rounded-full transition-all" style={{ width: `${progress}%` }} />
+            <div className="w-full bg-indigo-100/50 dark:bg-indigo-950/30 rounded-full h-2 mb-4 border border-indigo-200/20 dark:border-indigo-500/10">
+              <div className="bg-indigo-500 shadow-[0_0_8px_rgba(79,70,229,0.4)] h-2 rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
             </div>
 
-            <div className="flex items-center gap-4 text-sm text-gray-500 border-t border-gray-100 pt-3">
+            <div className="flex items-center gap-4 text-sm text-neutral-500 dark:text-neutral-400 border-t border-neutral-100 dark:border-neutral-800 pt-3">
               <div className="flex items-center gap-1">
                 <Users className="h-4 w-4" />
                 <span>{project.memberCount} members</span>

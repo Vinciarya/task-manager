@@ -45,16 +45,16 @@ export function MemberList({ members, onAddMember, onRemoveMember }: MemberListP
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-      <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-        <h3 className="text-sm font-medium text-gray-900 flex items-center gap-2">
-          <Shield className="h-4 w-4 text-gray-500" />
+    <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
+      <div className="px-4 py-3 border-b border-border flex items-center justify-between bg-muted/30">
+        <h3 className="text-sm font-bold text-foreground flex items-center gap-2 font-heading">
+          <Shield className="h-4 w-4 text-muted-foreground" />
           Project Members ({members.length})
         </h3>
         {isAdmin && !showAddForm && (
           <button
             onClick={() => setShowAddForm(true)}
-            className="inline-flex items-center text-xs font-medium text-indigo-600 hover:text-indigo-800"
+            className="inline-flex items-center text-xs font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
           >
             <UserPlus className="h-3 w-3 mr-1" />
             Add Member
@@ -63,7 +63,7 @@ export function MemberList({ members, onAddMember, onRemoveMember }: MemberListP
       </div>
 
       {showAddForm && isAdmin && (
-        <div className="p-4 border-b border-gray-200 bg-indigo-50/50">
+        <div className="p-4 border-b border-border bg-indigo-50/50 dark:bg-indigo-900/10">
           <AddMemberForm
             onAdd={onAddMember}
             onCancel={() => setShowAddForm(false)}
@@ -71,9 +71,9 @@ export function MemberList({ members, onAddMember, onRemoveMember }: MemberListP
         </div>
       )}
 
-      <ul className="divide-y divide-gray-200">
+      <ul className="divide-y divide-border">
         {members.map((member) => (
-          <li key={member.userId} className="px-4 py-3 flex items-center justify-between hover:bg-gray-50">
+          <li key={member.userId} className="px-4 py-3 flex items-center justify-between hover:bg-muted/50 transition-colors">
             <div className="flex items-center min-w-0 gap-3">
               <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-500">
                 <span className="text-sm font-medium leading-none text-white">
@@ -81,17 +81,19 @@ export function MemberList({ members, onAddMember, onRemoveMember }: MemberListP
                 </span>
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-bold text-foreground truncate tracking-tight">
                   {member.user.name || 'Unknown User'}
-                  {member.userId === currentUserId && <span className="ml-2 text-xs text-gray-500 font-normal">(You)</span>}
+                  {member.userId === currentUserId && <span className="ml-2 text-xs text-muted-foreground font-normal">(You)</span>}
                 </p>
-                <p className="text-xs text-gray-500 truncate">{member.user.email}</p>
+                <p className="text-xs text-muted-foreground truncate">{member.user.email}</p>
               </div>
             </div>
             
             <div className="flex items-center gap-4">
-              <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                member.role === Role.ADMIN ? 'bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/10' : 'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-600/10'
+              <span className={`inline-flex items-center rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                member.role === Role.ADMIN 
+                  ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/10 dark:ring-red-500/20' 
+                  : 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 ring-1 ring-inset ring-blue-600/10 dark:ring-blue-500/20'
               }`}>
                 {member.role}
               </span>
