@@ -1,10 +1,8 @@
-<h1 align="center">
-  <br />
-  <img src="public/favicon.ico" alt="TaskFlow Logo" width="80" />
-  <br />
-  TaskFlow — Team Task Manager
-  <br />
-</h1>
+<p align="center">
+  <img src="public/taskflow.png" alt="TaskFlow Banner" width="720" />
+</p>
+
+<h1 align="center">TaskFlow — Team Task Manager</h1>
 
 <p align="center">
   <strong>A production-grade, full-stack team task management application built with Next.js 15, NextAuth v5, Prisma 6, PostgreSQL, and Tailwind CSS.</strong>
