@@ -45,8 +45,8 @@ export default function TasksPage() {
 
   return (
     <PageWrapper>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+      <div className="mb-10">
+        <h1 className="text-3xl font-bold leading-7 text-gray-900 sm:truncate sm:text-4xl sm:tracking-tight">
           All My Tasks
         </h1>
       </div>

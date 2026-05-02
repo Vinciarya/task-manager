@@ -7,6 +7,11 @@ import { useSession } from 'next-auth/react';
 import { IProjectWithMeta, Role } from '@/types';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { useProjectStore } from '@/store/projectStore';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+} from '@/components/ui/card';
 
 interface ProjectCardProps {
   project: IProjectWithMeta;
@@ -34,16 +39,17 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col h-full hover:shadow-md transition-shadow">
-        <div className="p-5 flex-1 flex flex-col">
+      <Card className="flex flex-col h-full card-premium">
+        <CardContent className="flex-1 flex flex-col pt-5">
+          {/* Title row + menu */}
           <div className="flex justify-between items-start mb-2 relative">
             <Link href={`/projects/${project.id}`} className="hover:underline flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 truncate">{project.name}</h3>
+              <h3 className="text-xl font-bold text-gray-900 truncate tracking-tight">{project.name}</h3>
             </Link>
-            
+
             {isAdmin && (
               <div className="relative ml-2">
-                <button 
+                <button
                   onClick={() => setShowMenu(!showMenu)}
                   onBlur={() => setTimeout(() => setShowMenu(false), 200)}
                   className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
@@ -69,11 +75,12 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
               </div>
             )}
           </div>
-          
+
           <p className="text-sm text-gray-500 mb-6 line-clamp-2 flex-1">
             {project.description || 'No description provided.'}
           </p>
 
+          {/* Progress */}
           <div className="mt-auto">
             <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
               <span>{project.taskCounts.DONE}/{totalTasks} tasks done</span>
@@ -90,19 +97,18 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
               </div>
               <div className="flex items-center gap-1 text-orange-500">
                 <Clock className="h-4 w-4" />
-                {/* Assuming overdue tasks not directly available in basic meta, mock or calculate if available, for now 0 */}
                 <span>0 overdue</span>
               </div>
             </div>
           </div>
-        </div>
-        
-        <div className="px-5 py-3 bg-gray-50 border-t border-gray-200">
+        </CardContent>
+
+        <CardFooter>
           <Link href={`/projects/${project.id}`} className="text-sm font-medium text-indigo-600 hover:text-indigo-800">
             View Project &rarr;
           </Link>
-        </div>
-      </div>
+        </CardFooter>
+      </Card>
 
       <ConfirmDialog
         isOpen={showDelete}

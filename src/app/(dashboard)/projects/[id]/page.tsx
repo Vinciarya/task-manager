@@ -105,7 +105,7 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
     <PageWrapper>
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">{project.name}</h1>
           <p className="mt-2 text-gray-500 max-w-2xl">{project.description}</p>
         </div>
         

@@ -1,91 +1,178 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, FolderKanban, CheckSquare, LogOut } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
+import { motion } from 'motion/react';
+import {
+  LayoutDashboard,
+  FolderKanban,
+  CheckSquare,
+  LogOut,
+} from 'lucide-react';
+
+import {
+  Sidebar as AcetSidebar,
+  SidebarBody,
+  SidebarLink,
+} from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { Role } from '@/types';
 
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Projects', href: '/projects', icon: FolderKanban },
-  { name: 'My Tasks', href: '/tasks', icon: CheckSquare },
+// ─── Logo ────────────────────────────────────────────────────────────────────
+
+function Logo() {
+  return (
+    <Link
+      href="/dashboard"
+      className="relative z-20 flex items-center gap-2 py-1 text-sm font-normal"
+    >
+      <CheckSquare className="h-5 w-6 shrink-0 text-indigo-500 dark:text-indigo-400" />
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="whitespace-pre font-bold text-neutral-900 dark:text-white tracking-tight text-lg"
+      >
+        TaskFlow
+      </motion.span>
+    </Link>
+  );
+}
+
+// ─── Navigation items ─────────────────────────────────────────────────────────
+
+const NAV_ITEMS = [
+  {
+    label: 'Dashboard',
+    href: '/dashboard',
+    icon: <LayoutDashboard className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />,
+  },
+  {
+    label: 'Projects',
+    href: '/projects',
+    icon: <FolderKanban className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />,
+  },
+  {
+    label: 'My Tasks',
+    href: '/tasks',
+    icon: <CheckSquare className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />,
+  },
 ];
 
-export function Sidebar() {
+// ─── ActiveSidebarLink — wraps SidebarLink with active-route highlight ────────
+
+function ActiveSidebarLink({
+  href,
+  label,
+  icon,
+}: {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+}) {
   const pathname = usePathname();
+  const isActive =
+    pathname === href || pathname.startsWith(`${href}/`);
+
+  return (
+    <SidebarLink
+      link={{ label, href, icon }}
+      className={cn(
+        'rounded-md px-2 transition-colors',
+        isActive
+          ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300'
+          : 'text-neutral-700 hover:bg-neutral-200/60 dark:text-neutral-200 dark:hover:bg-neutral-700/50',
+      )}
+    />
+  );
+}
+
+// ─── Main Sidebar export ──────────────────────────────────────────────────────
+
+export function Sidebar() {
+  const [open, setOpen] = useState(false);
   const { data: session } = useSession();
   const user = session?.user;
 
+  // Avatar initials fallback
+  const initials = user?.name?.[0]?.toUpperCase() ?? 'U';
+
+  const avatarIcon = (
+    <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white">
+      {initials}
+    </span>
+  );
+
   return (
-    <div className="flex h-full w-64 flex-col bg-gray-900">
-      <div className="flex h-16 shrink-0 items-center px-6">
-        <h1 className="text-xl font-bold text-white flex items-center gap-2">
-          <CheckSquare className="h-6 w-6 text-indigo-500" />
-          TaskFlow
-        </h1>
-      </div>
-      
-      <div className="flex flex-1 flex-col overflow-y-auto">
-        <nav className="flex-1 space-y-1 px-4 py-4">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
+    <AcetSidebar open={open} setOpen={setOpen}>
+      <SidebarBody className="h-full justify-between gap-10 border-r border-neutral-200 bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-800">
+        {/* Top section */}
+        <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
+          <Logo />
+
+          <nav className="mt-8 flex flex-col gap-1">
+            {NAV_ITEMS.map((item) => (
+              <ActiveSidebarLink key={item.href} {...item} />
+            ))}
+          </nav>
+        </div>
+
+        {/* Bottom section — user profile + sign out */}
+        {user && (
+          <div className="flex flex-col gap-1 border-t border-neutral-200 pt-4 dark:border-neutral-700">
+            {/* User row */}
+            <SidebarLink
+              link={{
+                label: user.name ?? user.email ?? 'User',
+                href: '#',
+                icon: avatarIcon,
+              }}
+              className="cursor-default select-none px-2"
+            />
+
+            {/* Role badge — visible only when expanded */}
+            <motion.div
+              animate={{
+                display: open ? 'flex' : 'none',
+                opacity: open ? 1 : 0,
+              }}
+              className="items-center gap-2 px-2 pb-1"
+            >
+              <span
                 className={cn(
-                  isActive
-                    ? 'bg-gray-800 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white',
-                  'group flex items-center rounded-md px-2 py-2 text-sm font-medium'
+                  'inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium',
+                  user.role === Role.ADMIN
+                    ? 'bg-red-500/10 text-red-500 dark:text-red-400'
+                    : 'bg-blue-500/10 text-blue-500 dark:text-blue-400',
                 )}
               >
-                <item.icon
-                  className={cn(
-                    isActive ? 'text-white' : 'text-gray-400 group-hover:text-white',
-                    'mr-3 h-5 w-5 shrink-0'
-                  )}
-                  aria-hidden="true"
-                />
-                {item.name}
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-
-      {user && (
-        <div className="border-t border-gray-800 p-4">
-          <div className="flex items-center w-full mb-4">
-            <div className="flex-shrink-0">
-              <span className="inline-block h-9 w-9 rounded-full bg-gray-600 flex items-center justify-center text-sm font-medium text-white">
-                {user.name?.[0]?.toUpperCase() || 'U'}
+                {user.role}
               </span>
-            </div>
-            <div className="ml-3 truncate">
-              <p className="text-sm font-medium text-white truncate">{user.name}</p>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className={cn(
-                  "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium",
-                  user.role === Role.ADMIN ? "bg-red-500/10 text-red-400" : "bg-blue-500/10 text-blue-400"
-                )}>
-                  {user.role}
-                </span>
-                <p className="text-xs font-medium text-gray-400 truncate">{user.email}</p>
-              </div>
-            </div>
+              <span className="truncate text-xs text-neutral-500 dark:text-neutral-400">
+                {user.email}
+              </span>
+            </motion.div>
+
+            {/* Sign out */}
+            <button
+              onClick={() => signOut({ callbackUrl: '/login' })}
+              className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-neutral-700 transition-colors hover:bg-neutral-200/60 dark:text-neutral-200 dark:hover:bg-neutral-700/50"
+            >
+              <LogOut className="h-5 w-5 shrink-0 text-neutral-700 dark:text-neutral-200" />
+              <motion.span
+                animate={{
+                  display: open ? 'inline-block' : 'none',
+                  opacity: open ? 1 : 0,
+                }}
+                className="whitespace-pre text-sm"
+              >
+                Sign Out
+              </motion.span>
+            </button>
           </div>
-          <button
-            onClick={() => signOut({ callbackUrl: '/login' })}
-            className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white"
-          >
-            <LogOut className="h-5 w-5 text-gray-400" />
-            Sign Out
-          </button>
-        </div>
-      )}
-    </div>
+        )}
+      </SidebarBody>
+    </AcetSidebar>
   );
 }

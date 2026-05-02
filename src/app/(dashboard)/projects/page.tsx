@@ -17,7 +17,7 @@ export default function ProjectsPage() {
     <PageWrapper>
       <div className="sm:flex sm:items-center sm:justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+          <h1 className="text-3xl font-bold leading-7 text-gray-900 sm:truncate sm:text-4xl sm:tracking-tight">
             Projects
           </h1>
           <p className="mt-2 text-sm text-gray-500">

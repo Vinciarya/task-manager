@@ -7,6 +7,12 @@ import apiClient from '@/services/apiClient';
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 import Link from 'next/link';
 import { TaskStatus } from '@/types';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 interface DashboardTask {
   id: string;
@@ -26,6 +32,39 @@ interface DashboardStats {
   myTasks?: DashboardTask[];
   recentActivity?: DashboardTask[];
 }
+
+const statCards = (stats: DashboardStats) => [
+  {
+    label: 'Total Tasks',
+    value: stats.totalTasks,
+    icon: <CheckSquare className="h-6 w-6 text-white" aria-hidden="true" />,
+    bg: 'bg-indigo-500',
+    accent: '',
+  },
+  {
+    label: 'In Progress',
+    value: stats.byStatus?.IN_PROGRESS ?? 0,
+    icon: <Clock className="h-6 w-6 text-white" aria-hidden="true" />,
+    bg: 'bg-blue-500',
+    accent: '',
+  },
+  {
+    label: 'Overdue',
+    value: stats.overdueCount ?? stats.overdueTasks ?? 0,
+    icon: <AlertTriangle className="h-6 w-6 text-white" aria-hidden="true" />,
+    bg: 'bg-red-500',
+    accent: 'ring-1 ring-red-500/20',
+    valueClass: 'text-red-600',
+    labelClass: 'text-red-600',
+  },
+  {
+    label: 'Due Today',
+    value: stats.dueTodayCount ?? stats.tasksDueToday ?? 0,
+    icon: <CalendarDays className="h-6 w-6 text-white" aria-hidden="true" />,
+    bg: 'bg-orange-500',
+    accent: '',
+  },
+];
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -65,102 +104,78 @@ export default function DashboardPage() {
     );
   }
 
+  const tasks = stats.myTasks ?? stats.recentActivity ?? [];
+
   return (
     <PageWrapper>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+      <div className="mb-10">
+        <h1 className="text-3xl font-bold leading-7 text-gray-900 sm:truncate sm:text-4xl sm:tracking-tight">
           Dashboard
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <div className="relative overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 shadow sm:px-6 sm:pt-6 border border-gray-100">
-          <dt>
-            <div className="absolute rounded-md bg-indigo-500 p-3">
-              <CheckSquare className="h-6 w-6 text-white" aria-hidden="true" />
-            </div>
-            <p className="ml-16 truncate text-sm font-medium text-gray-500">Total Tasks</p>
-          </dt>
-          <dd className="ml-16 flex items-baseline pb-6 sm:pb-7">
-            <p className="text-2xl font-semibold text-gray-900">{stats.totalTasks}</p>
-          </dd>
-        </div>
-
-        <div className="relative overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 shadow sm:px-6 sm:pt-6 border border-gray-100">
-          <dt>
-            <div className="absolute rounded-md bg-blue-500 p-3">
-              <Clock className="h-6 w-6 text-white" aria-hidden="true" />
-            </div>
-            <p className="ml-16 truncate text-sm font-medium text-gray-500">In Progress</p>
-          </dt>
-          <dd className="ml-16 flex items-baseline pb-6 sm:pb-7">
-            <p className="text-2xl font-semibold text-gray-900">{stats.byStatus?.IN_PROGRESS || 0}</p>
-          </dd>
-        </div>
-
-        <div className="relative overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 shadow sm:px-6 sm:pt-6 border border-red-100 ring-1 ring-red-500/20">
-          <dt>
-            <div className="absolute rounded-md bg-red-500 p-3">
-              <AlertTriangle className="h-6 w-6 text-white" aria-hidden="true" />
-            </div>
-            <p className="ml-16 truncate text-sm font-medium text-red-600">Overdue</p>
-          </dt>
-          <dd className="ml-16 flex items-baseline pb-6 sm:pb-7">
-            <p className="text-2xl font-semibold text-red-600">{stats.overdueCount ?? stats.overdueTasks ?? 0}</p>
-          </dd>
-        </div>
-
-        <div className="relative overflow-hidden rounded-lg bg-white px-4 pb-12 pt-5 shadow sm:px-6 sm:pt-6 border border-gray-100">
-          <dt>
-            <div className="absolute rounded-md bg-orange-500 p-3">
-              <CalendarDays className="h-6 w-6 text-white" aria-hidden="true" />
-            </div>
-            <p className="ml-16 truncate text-sm font-medium text-gray-500">Due Today</p>
-          </dt>
-          <dd className="ml-16 flex items-baseline pb-6 sm:pb-7">
-            <p className="text-2xl font-semibold text-gray-900">{stats.dueTodayCount ?? stats.tasksDueToday ?? 0}</p>
-          </dd>
-        </div>
+      {/* Stat cards */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
+        {statCards(stats).map((s) => (
+          <Card key={s.label} className={`overflow-hidden card-premium ${s.accent}`}>
+            <CardContent className="relative pt-6 pb-12 px-5 sm:px-8">
+              <dt>
+                <div className={`absolute rounded-xl ${s.bg} p-3.5 shadow-lg`}>
+                  {s.icon}
+                </div>
+                <p className={`ml-20 truncate text-sm font-bold uppercase tracking-wider ${s.labelClass ?? 'text-gray-500'}`}>
+                  {s.label}
+                </p>
+              </dt>
+              <dd className="ml-20 flex items-baseline">
+                <p className={`text-3xl font-bold tracking-tight ${s.valueClass ?? 'text-gray-900'}`}>
+                  {s.value}
+                </p>
+              </dd>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
+      {/* Bottom section */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Tasks by Status</h2>
-          <div className="flex flex-col gap-4">
-            {/* Simple CSS-based bar charts instead of Recharts to save setup */}
-            <div className="flex items-center gap-4">
-              <span className="w-24 text-sm text-gray-600">To Do</span>
-              <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-                <div className="bg-gray-400 h-full" style={{ width: `${(stats.byStatus?.TODO || 0) / (stats.totalTasks || 1) * 100}%` }} />
+        {/* Tasks by status */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Tasks by Status</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            {[
+              { label: 'To Do', key: TaskStatus.TODO, color: 'bg-gray-400' },
+              { label: 'In Progress', key: TaskStatus.IN_PROGRESS, color: 'bg-blue-500' },
+              { label: 'Done', key: TaskStatus.DONE, color: 'bg-green-500' },
+            ].map(({ label, key, color }) => (
+              <div key={key} className="flex items-center gap-4">
+                <span className="w-24 text-sm text-gray-600">{label}</span>
+                <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                  <div
+                    className={`${color} h-full`}
+                    style={{ width: `${((stats.byStatus?.[key] ?? 0) / (stats.totalTasks || 1)) * 100}%` }}
+                  />
+                </div>
+                <span className="text-sm font-medium">{stats.byStatus?.[key] ?? 0}</span>
               </div>
-              <span className="text-sm font-medium">{stats.byStatus?.TODO || 0}</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="w-24 text-sm text-gray-600">In Progress</span>
-              <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-                <div className="bg-blue-500 h-full" style={{ width: `${(stats.byStatus?.IN_PROGRESS || 0) / (stats.totalTasks || 1) * 100}%` }} />
-              </div>
-              <span className="text-sm font-medium">{stats.byStatus?.IN_PROGRESS || 0}</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="w-24 text-sm text-gray-600">Done</span>
-              <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-                <div className="bg-green-500 h-full" style={{ width: `${(stats.byStatus?.DONE || 0) / (stats.totalTasks || 1) * 100}%` }} />
-              </div>
-              <span className="text-sm font-medium">{stats.byStatus?.DONE || 0}</span>
-            </div>
-          </div>
-        </div>
+            ))}
+          </CardContent>
+        </Card>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col">
-          <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-            <h2 className="text-lg font-medium text-gray-900">Recent Tasks</h2>
-            <Link href="/tasks" className="text-sm text-indigo-600 hover:text-indigo-800 font-medium">View all</Link>
-          </div>
-          <div className="flex-1 overflow-y-auto">
-            {(stats.myTasks ?? stats.recentActivity ?? []).length > 0 ? (
+        {/* Recent tasks */}
+        <Card className="overflow-hidden flex flex-col">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-gray-200">
+            <CardTitle>Recent Tasks</CardTitle>
+            <Link href="/tasks" className="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+              View all
+            </Link>
+          </CardHeader>
+          <CardContent className="flex-1 overflow-y-auto p-0">
+            {tasks.length > 0 ? (
               <ul className="divide-y divide-gray-200">
-                {(stats.myTasks ?? stats.recentActivity ?? []).slice(0, 5).map((task) => (
+                {tasks.slice(0, 5).map((task) => (
                   <li key={task.id} className="p-4 hover:bg-gray-50">
                     <Link href={`/projects/${task.projectId}`} className="block">
                       <p className="text-sm font-medium text-gray-900 truncate">{task.title}</p>
@@ -175,8 +190,8 @@ export default function DashboardPage() {
             ) : (
               <div className="p-6 text-center text-sm text-gray-500">No tasks assigned to you.</div>
             )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </PageWrapper>
   );
