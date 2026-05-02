@@ -9,12 +9,19 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "next": "16.2.4",
+    "@prisma/client": "^7.8.0",
+    "bcryptjs": "^3.0.3",
+    "next": "^16.2.4",
+    "next-auth": "^5.0.0-beta.31",
+    "prisma": "^6.19.3",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "zod": "^4.4.2",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -22,5 +29,12 @@
     "eslint-config-next": "16.2.4",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "postcss": "^8.5.10",
+    "send": "^0.19.0",
+    "serialize-javascript": "^7.0.5",
+    "terser": "^4.8.1",
+    "uuid": "^14.0.0"
   }
 }
