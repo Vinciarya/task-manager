@@ -1,8 +1,7 @@
-import type { NextAuthConfig } from "next-auth";
+import type { NextAuthConfig, User as NextAuthUser } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { AuthService } from "@/modules/auth/auth.service";
-import { AuthRepository } from "@/modules/auth/auth.repository";
 import { AppError } from "@/lib/errors";
+import { authService } from "@/lib/container";
 import { Role } from "@/types";
 
 // =============================================================================
@@ -15,8 +14,6 @@ import { Role } from "@/types";
 // Auth Configuration
 // =============================================================================
 
-const authService = new AuthService(new AuthRepository());
-
 export const authConfig = {
   providers: [
     CredentialsProvider({
@@ -25,24 +22,24 @@ export const authConfig = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials): Promise<NextAuthUser | null> {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
 
         try {
           const user = await authService.validateCredentials(
-            credentials.email as string,
-            credentials.password as string
+            String(credentials.email),
+            String(credentials.password)
           );
 
           return {
             id: user.id,
             email: user.email,
             name: user.name,
-            role: user.role as Role,
+            role: user.role === Role.ADMIN ? Role.ADMIN : Role.MEMBER,
           };
-        } catch (error) {
+        } catch (error: unknown) {
           // Return null (not throw) on invalid credentials in authorize()
           if (error instanceof AppError && error.statusCode === 401) {
             return null;
@@ -59,14 +56,14 @@ export const authConfig = {
       // `user` is only available on the first sign-in
       if (user) {
         token.id = user.id;
-        token.role = user.role as Role;
+        token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as Role;
+        session.user.id = String(token.id);
+        session.user.role = token.role === Role.ADMIN ? Role.ADMIN : Role.MEMBER;
       }
       return session;
     },

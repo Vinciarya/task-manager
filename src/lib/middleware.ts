@@ -10,16 +10,15 @@
  * export const POST = withHandler(
  *   withAuth(
  *     withRole(Role.ADMIN)(
- *       withValidation(createProjectSchema)(handler)
+ *       withValidation(createProjectSchema)(async (req, context) => {
+ *         const body = getParsedBody<CreateProjectInput>(req);
+ *         const userId = req.headers.get("x-user-id")!;
+ *         // ...
+ *         return ApiResponse.created(body, "Created");
+ *       })
  *     )
  *   )
  * );
- *
- * async function handler(req: NextRequest) {
- *   const body = getParsedBody<CreateProjectInput>(req);
- *   const userId = req.headers.get("x-user-id")!;
- *   // ...
- * }
  * ```
  */
 

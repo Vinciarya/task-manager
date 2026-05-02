@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { request } from "@/services/api.client";
+import { getErrorMessage } from "@/lib/error-message";
 
 export interface DashboardStats {
   totalProjects: number;
@@ -21,8 +22,8 @@ export function useDashboard() {
       if (response.success && response.data) {
         setStats(response.data);
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to load dashboard stats");
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, "Failed to load dashboard stats"));
     } finally {
       setIsLoading(false);
     }
@@ -37,8 +38,10 @@ export function useDashboard() {
         if (response.success && response.data && isMounted) {
           setStats(response.data);
         }
-      } catch (err: any) {
-        if (isMounted) setError(err.message || "Failed to load dashboard stats");
+      } catch (error: unknown) {
+        if (isMounted) {
+          setError(getErrorMessage(error, "Failed to load dashboard stats"));
+        }
       } finally {
         if (isMounted) setIsLoading(false);
       }

@@ -1,20 +1,15 @@
-import { BaseRepository } from "@/lib/base.repository";
+import { BaseRepository, type IBaseRepository } from "@/lib/base.repository";
+import { db } from "@/lib/prisma";
 import { AppError } from "@/lib/errors";
-import { TaskStatus } from "@/types";
-import type { PaginatedResponse } from "@/types";
+import { TaskStatus, type PaginatedResponse, type ITask } from "@/types";
 import type { TaskFilters } from "@/modules/task/task.schema";
 
-// ---------------------------------------------------------------------------
-// Prisma imports
-// Generated client output: prisma/schema.prisma → output = "../app/generated/prisma"
-// ---------------------------------------------------------------------------
+import { PrismaClient, Prisma } from "@prisma/client";
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { PrismaClient } = require("../../app/generated/prisma") as typeof import("../../app/generated/prisma");
-
-import type { Task, Prisma } from "../../app/generated/prisma";
-
-const prisma = new PrismaClient();
+// Use inferred types from the Prisma Client to avoid flaky namespace resolution
+type TaskCreateInput = Prisma.Args<PrismaClient["task"], "create">["data"];
+type TaskUpdateInput = Prisma.Args<PrismaClient["task"], "update">["data"];
+type TaskWhereInput = Prisma.Args<PrismaClient["task"], "findMany">["where"];
 
 // =============================================================================
 // Supporting types
@@ -22,9 +17,9 @@ const prisma = new PrismaClient();
 
 /** Tasks grouped by their status — the shape consumed by a Kanban board. */
 export interface TasksByStatus {
-  [TaskStatus.TODO]: Task[];
-  [TaskStatus.IN_PROGRESS]: Task[];
-  [TaskStatus.DONE]: Task[];
+  [TaskStatus.TODO]: ITask[];
+  [TaskStatus.IN_PROGRESS]: ITask[];
+  [TaskStatus.DONE]: ITask[];
 }
 
 /** Aggregated statistics returned by the dashboard endpoint. */
@@ -34,39 +29,30 @@ export interface DashboardStats {
   /** Count of the user's tasks broken down by status. */
   byStatus: Record<TaskStatus, number>;
   /** Number of tasks past their due date that are not yet DONE. */
+  overdueCount: number;
   overdueTasks: number;
   /** Number of tasks whose due date falls on today (any time). */
+  dueTodayCount: number;
   tasksDueToday: number;
   /** The 5 most recently updated tasks for the activity feed. */
-  recentActivity: Task[];
+  recentActivity: ITask[];
 }
 
-// =============================================================================
-// TaskRepository
-// =============================================================================
+export interface ITaskRepository
+  extends IBaseRepository<ITask, TaskCreateInput, TaskUpdateInput> {
+  findTasksWithFilters(filters: TaskFilters): Promise<PaginatedResponse<ITask>>;
+  findTasksByProject(projectId: string): Promise<TasksByStatus>;
+  getDashboardStats(userId: string): Promise<DashboardStats>;
+}
 
-/**
- * Data-access layer for tasks.
- *
- * Extends {@link BaseRepository} for generic CRUD; adds three domain-specific
- * query methods: filter/paginate, group by status, and dashboard stats.
- *
- * @example
- * ```ts
- * const repo = new TaskRepository();
- * const page = await repo.findTasksWithFilters({ projectId, page: 1, limit: 20 });
- * ```
- */
 export class TaskRepository extends BaseRepository<
-  Task,
-  Prisma.TaskCreateInput,
-  Prisma.TaskUpdateInput
-> {
-  protected model = prisma.task;
-
-  // ---------------------------------------------------------------------------
-  // Queries
-  // ---------------------------------------------------------------------------
+  ITask,
+  TaskCreateInput,
+  TaskUpdateInput
+> implements ITaskRepository {
+  constructor() {
+    super(db.task);
+  }
 
   /**
    * Returns a paginated, filtered list of tasks for a project.
@@ -77,7 +63,7 @@ export class TaskRepository extends BaseRepository<
    */
   async findTasksWithFilters(
     filters: TaskFilters
-  ): Promise<PaginatedResponse<Task>> {
+  ): Promise<PaginatedResponse<ITask>> {
     const {
       projectId,
       status,
@@ -90,8 +76,8 @@ export class TaskRepository extends BaseRepository<
 
     const now = new Date();
 
-    const where: Prisma.TaskWhereInput = {
-      projectId,
+    const where: TaskWhereInput = {
+      ...(projectId !== undefined && { projectId }),
       ...(status !== undefined && { status }),
       ...(priority !== undefined && { priority }),
       ...(assignedToId !== undefined && { assignedToId }),
@@ -105,7 +91,7 @@ export class TaskRepository extends BaseRepository<
       const skip = (page - 1) * limit;
 
       const [items, total] = await Promise.all([
-        prisma.task.findMany({
+        db.task.findMany({
           where,
           orderBy: { updatedAt: "desc" },
           skip,
@@ -115,11 +101,11 @@ export class TaskRepository extends BaseRepository<
             createdBy: { select: { id: true, name: true } },
           },
         }),
-        prisma.task.count({ where }),
+        db.task.count({ where }),
       ]);
 
       return {
-        items: items as Task[],
+        items: items as ITask[],
         total,
         page,
         limit,
@@ -136,7 +122,7 @@ export class TaskRepository extends BaseRepository<
    */
   async findTasksByProject(projectId: string): Promise<TasksByStatus> {
     try {
-      const tasks = await prisma.task.findMany({
+      const tasks = await db.task.findMany({
         where: { projectId },
         orderBy: [{ priority: "desc" }, { createdAt: "asc" }],
         include: {
@@ -154,7 +140,7 @@ export class TaskRepository extends BaseRepository<
       for (const task of tasks) {
         const bucket = task.status as TaskStatus;
         if (bucket in grouped) {
-          grouped[bucket].push(task as Task);
+          grouped[bucket].push(task as ITask);
         }
       }
 
@@ -181,7 +167,7 @@ export class TaskRepository extends BaseRepository<
       todayEnd.setHours(23, 59, 59, 999);
 
       // Single broad fetch — all tasks the user owns or is assigned to.
-      const allTasks = await prisma.task.findMany({
+      const allTasks = await db.task.findMany({
         where: {
           OR: [{ createdById: userId }, { assignedToId: userId }],
         },
@@ -225,10 +211,11 @@ export class TaskRepository extends BaseRepository<
       return {
         totalTasks: allTasks.length,
         byStatus,
-        overdueTasks,
-        tasksDueToday,
-        // Most-recently-updated 5 tasks for the activity feed
-        recentActivity: allTasks.slice(0, 5) as Task[],
+        overdueCount: overdueTasks,
+        overdueTasks, // Keep for backward compatibility
+        dueTodayCount: tasksDueToday,
+        tasksDueToday, // Keep for backward compatibility
+        recentActivity: allTasks.slice(0, 5) as ITask[],
       };
     } catch (error) {
       this.handleError(error, "Failed to fetch dashboard statistics.");

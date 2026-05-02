@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 import { AppError } from "@/lib/errors";
 import type { MiddlewareFn, RouteContext } from "@/lib/with-handler";
 
@@ -42,7 +42,6 @@ export function withAuth(fn: MiddlewareFn): MiddlewareFn {
       headers,
       body: req.body,
       // Propagate duplex so that body streaming works in Node.js runtime
-      // @ts-expect-error — `duplex` is valid on the underlying RequestInit
       duplex: "half",
     });
 

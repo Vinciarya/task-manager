@@ -61,6 +61,8 @@ export interface ITask {
   createdById: string;
   createdAt: Date;
   updatedAt: Date;
+  assignedTo?: { id: string; name: string; email: string } | null;
+  createdBy?: { id: string; name: string } | null;
 }
 
 /** IProject enriched with aggregated metadata. */
@@ -114,9 +116,19 @@ declare module "next-auth" {
   }
 
   // `User` is the shape returned by the `authorize` / OAuth profile callbacks.
-  interface User extends SessionUser {}
+  interface User {
+    id: string;
+    email: string;
+    name: string;
+    role: Role;
+  }
 }
 
 declare module "next-auth/jwt" {
-  interface JWT extends SessionUser {}
+  interface JWT {
+    id: string;
+    email: string;
+    name: string;
+    role: Role;
+  }
 }

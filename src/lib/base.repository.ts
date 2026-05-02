@@ -21,7 +21,17 @@ export interface FindAllParams {
  * Minimal shape required from a Prisma delegate.
  * All generated delegates satisfy this contract.
  */
-interface PrismaDelegate {
+export interface IBaseRepository<T, CreateInput, UpdateInput> {
+  findById(id: string): Promise<T>;
+  findAll(params?: FindAllParams): Promise<PaginatedResponse<T>>;
+  findOne(where: Partial<T>): Promise<T | null>;
+  create(data: CreateInput): Promise<T>;
+  update(id: string, data: UpdateInput): Promise<T>;
+  delete(id: string): Promise<void>;
+  count(where?: Partial<T>): Promise<number>;
+}
+
+export interface PrismaDelegate {
   findUnique(args: {
     where: Record<string, unknown>;
   }): Promise<unknown>;
@@ -54,25 +64,16 @@ interface PrismaDelegate {
  * @template CreateInput - The Prisma `XxxCreateInput` type.
  * @template UpdateInput - The Prisma `XxxUpdateInput` type.
  *
- * @example
- * ```ts
- * class UserRepository extends BaseRepository<User, Prisma.UserCreateInput, Prisma.UserUpdateInput> {
- *   protected model = prisma.user;
- * }
- * ```
+ * Concrete repositories pass their generated Prisma delegate to `super(...)`.
  */
-export abstract class BaseRepository<T, CreateInput, UpdateInput> {
-  /** Concrete repositories assign their Prisma delegate here. */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected abstract model: any;
+export abstract class BaseRepository<T, CreateInput, UpdateInput>
+  implements IBaseRepository<T, CreateInput, UpdateInput>
+{
+  readonly #model: PrismaDelegate;
 
-  constructor(
-    // Accepts the delegate directly so the class can be instantiated without a
-    // full PrismaClient reference in tests / DI containers.
-    // Concrete repositories may ignore this if they prefer `protected model`.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    protected readonly delegate?: any
-  ) {}
+  protected constructor(model: PrismaDelegate) {
+    this.#model = model;
+  }
 
   // ---------------------------------------------------------------------------
   // Read
@@ -84,7 +85,7 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
    */
   async findById(id: string): Promise<T> {
     try {
-      const record = (await (this.model as PrismaDelegate).findUnique({
+      const record = (await this.#model.findUnique({
         where: { id },
       })) as T | null;
 
@@ -110,15 +111,32 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
   }: FindAllParams = {}): Promise<PaginatedResponse<T>> {
     try {
       const skip = (page - 1) * limit;
+      const findManyArgs: {
+        where?: Record<string, unknown>;
+        orderBy?: Record<string, unknown>;
+        skip?: number;
+        take?: number;
+      } = {
+        skip,
+        take: limit,
+      };
+
+      if (where !== undefined) {
+        findManyArgs.where = where;
+      }
+
+      if (orderBy !== undefined) {
+        findManyArgs.orderBy = orderBy;
+      }
+
+      const countArgs: { where?: Record<string, unknown> } = {};
+      if (where !== undefined) {
+        countArgs.where = where;
+      }
 
       const [items, total] = await Promise.all([
-        (this.model as PrismaDelegate).findMany({
-          where,
-          orderBy,
-          skip,
-          take: limit,
-        }) as Promise<T[]>,
-        (this.model as PrismaDelegate).count({ where }),
+        this.#model.findMany(findManyArgs) as Promise<T[]>,
+        this.#model.count(countArgs),
       ]);
 
       return {
@@ -139,7 +157,7 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
    */
   async findOne(where: Partial<T>): Promise<T | null> {
     try {
-      return ((await (this.model as PrismaDelegate).findFirst({
+      return ((await this.#model.findFirst({
         where: where as Record<string, unknown>,
       })) ?? null) as T | null;
     } catch (error) {
@@ -154,7 +172,7 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
   /** Creates and returns a new record. */
   async create(data: CreateInput): Promise<T> {
     try {
-      return (await (this.model as PrismaDelegate).create({ data })) as T;
+      return (await this.#model.create({ data })) as T;
     } catch (error) {
       this.rethrow(error);
     }
@@ -166,7 +184,7 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
    */
   async update(id: string, data: UpdateInput): Promise<T> {
     try {
-      return (await (this.model as PrismaDelegate).update({
+      return (await this.#model.update({
         where: { id },
         data,
       })) as T;
@@ -182,7 +200,7 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
    */
   async delete(id: string): Promise<void> {
     try {
-      await (this.model as PrismaDelegate).delete({ where: { id } });
+      await this.#model.delete({ where: { id } });
     } catch (error) {
       this.rethrowPrisma(error, id);
     }
@@ -195,9 +213,12 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
   /** Counts records matching an optional partial filter. */
   async count(where?: Partial<T>): Promise<number> {
     try {
-      return await (this.model as PrismaDelegate).count({
-        where: where as Record<string, unknown> | undefined,
-      });
+      const args: { where?: Record<string, unknown> } = {};
+      if (where !== undefined) {
+        args.where = where as Record<string, unknown>;
+      }
+
+      return await this.#model.count(args);
     } catch (error) {
       this.rethrow(error);
     }

@@ -3,6 +3,7 @@ import { useTaskStore } from "@/store";
 import { taskService } from "@/services";
 import { CreateTaskInput, UpdateStatusInput } from "@/modules/task/task.schema";
 import { TaskStatus, TaskPriority, ITask } from "@/types";
+import { Logger } from "@/lib/logger";
 
 export function useTasks(projectId: string) {
   const {
@@ -24,8 +25,8 @@ export function useTasks(projectId: string) {
       if (response.success && response.data) {
         setTasks(response.data.items);
       }
-    } catch (error) {
-      console.error("Failed to fetch tasks", error);
+    } catch (error: unknown) {
+      Logger.error("Failed to fetch tasks", error);
     } finally {
       setLoading(false);
     }
@@ -35,7 +36,7 @@ export function useTasks(projectId: string) {
     fetchTasks();
   }, [fetchTasks]);
 
-  const createTask = async (data: CreateTaskInput) => {
+  const createTask = async (data: CreateTaskInput): Promise<ITask | null> => {
     const tempId = `temp-task-${Date.now()}`;
     const tempTask: ITask = {
       id: tempId,
@@ -61,13 +62,16 @@ export function useTasks(projectId: string) {
         addTask(response.data);
         return response.data;
       }
+
+      removeTask(tempId);
+      return null;
     } catch (error) {
       removeTask(tempId);
       throw error;
     }
   };
 
-  const updateStatus = async (id: string, newStatus: TaskStatus) => {
+  const updateStatus = async (id: string, newStatus: TaskStatus): Promise<void> => {
     let originalStatus: TaskStatus | null = null;
     
     // Find original status to allow reverting on failure
@@ -97,7 +101,7 @@ export function useTasks(projectId: string) {
     }
   };
 
-  const deleteTask = async (id: string) => {
+  const deleteTask = async (id: string): Promise<void> => {
     let taskToRestore: ITask | null = null;
     
     for (const status of Object.values(TaskStatus)) {

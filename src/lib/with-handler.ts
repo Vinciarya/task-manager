@@ -44,7 +44,10 @@ export type MiddlewareWrapper = (fn: MiddlewareFn) => MiddlewareFn;
  * export const POST = withHandler(
  *   withAuth(
  *     withRole(Role.ADMIN)(
- *       withValidation(createProjectSchema)(handler)
+ *       withValidation(createProjectSchema)(async (req, context) => {
+ *         const body = getParsedBody<CreateProjectInput>(req);
+ *         return ApiResponse.created(body, "Created");
+ *       })
  *     )
  *   )
  * );

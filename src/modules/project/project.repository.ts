@@ -1,47 +1,35 @@
-import { BaseRepository } from "@/lib/base.repository";
+import { BaseRepository, type IBaseRepository } from "@/lib/base.repository";
 import { AppError } from "@/lib/errors";
-import { TaskStatus } from "@/types";
+import { db } from "@/lib/prisma";
+import { Role, TaskStatus, type IProject, type IProjectMember } from "@/types";
 import type { ProjectWithMeta, ProjectWithDetails } from "@/modules/project/project.types";
 
-// ---------------------------------------------------------------------------
-// Prisma imports
-// Generated client output: prisma/schema.prisma → output = "../app/generated/prisma"
-// Adjust the relative path if the prisma `output` option changes.
-// ---------------------------------------------------------------------------
+import { PrismaClient, Prisma } from "@prisma/client";
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { PrismaClient } = require("../../app/generated/prisma") as typeof import("../../app/generated/prisma");
+// Inferred types to avoid flaky namespace resolution
+type ProjectCreateInput = Prisma.Args<PrismaClient["project"], "create">["data"];
+type ProjectUpdateInput = Prisma.Args<PrismaClient["project"], "update">["data"];
+type ProjectMemberCreateInput = Prisma.Args<PrismaClient["projectMember"], "create">["data"];
 
-import type { Project, ProjectMember, Prisma } from "../../app/generated/prisma";
+export interface IProjectRepository
+  extends IBaseRepository<IProject, ProjectCreateInput, ProjectUpdateInput> {
+  findProjectsForUser(userId: string): Promise<ProjectWithMeta[]>;
+  findProjectWithDetails(id: string): Promise<ProjectWithDetails | null>;
+  findMembership(userId: string, projectId: string): Promise<IProjectMember | null>;
+  createWithOwner(data: ProjectCreateInput, userId: string): Promise<IProject>;
+  addMember(data: ProjectMemberCreateInput): Promise<IProjectMember>;
+  removeMember(userId: string, projectId: string): Promise<void>;
+  getAdminCount(projectId: string): Promise<number>;
+}
 
-const prisma = new PrismaClient();
-
-// =============================================================================
-// ProjectRepository
-// =============================================================================
-
-/**
- * Data-access layer for projects and project membership.
- *
- * Extends {@link BaseRepository} for generic CRUD (findById, findAll, create,
- * update, delete, count).  Project-specific queries are added below.
- *
- * @example
- * ```ts
- * const repo = new ProjectRepository();
- * const projects = await repo.findProjectsForUser(userId);
- * ```
- */
 export class ProjectRepository extends BaseRepository<
-  Project,
-  Prisma.ProjectCreateInput,
-  Prisma.ProjectUpdateInput
-> {
-  protected model = prisma.project;
-
-  // ---------------------------------------------------------------------------
-  // Queries
-  // ---------------------------------------------------------------------------
+  IProject,
+  ProjectCreateInput,
+  ProjectUpdateInput
+> implements IProjectRepository {
+  constructor() {
+    super(db.project);
+  }
 
   /**
    * Returns all projects the user is a member of, enriched with member count
@@ -52,7 +40,7 @@ export class ProjectRepository extends BaseRepository<
    */
   async findProjectsForUser(userId: string): Promise<ProjectWithMeta[]> {
     try {
-      const projects = await prisma.project.findMany({
+      const projects = await db.project.findMany({
         where: {
           members: { some: { userId } },
         },
@@ -94,7 +82,7 @@ export class ProjectRepository extends BaseRepository<
    */
   async findProjectWithDetails(id: string): Promise<ProjectWithDetails | null> {
     try {
-      const project = await prisma.project.findUnique({
+      const project = await db.project.findUnique({
         where: { id },
         include: {
           members: {
@@ -131,16 +119,18 @@ export class ProjectRepository extends BaseRepository<
           projectId: m.projectId,
           role: m.role as import("@/types").Role,
           joinedAt: m.joinedAt,
-          user: m.user
+          ...(m.user
             ? {
-                id: m.user.id,
-                name: m.user.name,
-                email: m.user.email,
-                role: m.user.role as import("@/types").Role,
-                createdAt: m.user.createdAt,
-                updatedAt: m.user.updatedAt,
+                user: {
+                  id: m.user.id,
+                  name: m.user.name,
+                  email: m.user.email,
+                  role: m.user.role as import("@/types").Role,
+                  createdAt: m.user.createdAt,
+                  updatedAt: m.user.updatedAt,
+                },
               }
-            : undefined,
+            : {}),
         })),
       };
     } catch (error) {
@@ -155,12 +145,12 @@ export class ProjectRepository extends BaseRepository<
   async findMembership(
     userId: string,
     projectId: string
-  ): Promise<ProjectMember | null> {
+  ): Promise<IProjectMember | null> {
     try {
-      const membership = await prisma.projectMember.findUnique({
+      const membership = await db.projectMember.findUnique({
         where: { userId_projectId: { userId, projectId } },
       });
-      return membership ?? null;
+      return (membership as IProjectMember) ?? null;
     } catch (error) {
       this.handleError(error, "Failed to look up project membership.");
     }
@@ -174,9 +164,9 @@ export class ProjectRepository extends BaseRepository<
    * Adds a user to a project with the given role.
    * @throws {AppError} 409 if the user is already a member.
    */
-  async addMember(data: Prisma.ProjectMemberCreateInput): Promise<ProjectMember> {
+  async addMember(data: ProjectMemberCreateInput): Promise<IProjectMember> {
     try {
-      return await prisma.projectMember.create({ data });
+      return (await db.projectMember.create({ data })) as IProjectMember;
     } catch (error) {
       // Prisma P2002 = unique constraint violation (already a member)
       const code = (error as Record<string, unknown>)?.["code"];
@@ -193,7 +183,7 @@ export class ProjectRepository extends BaseRepository<
    */
   async removeMember(userId: string, projectId: string): Promise<void> {
     try {
-      await prisma.projectMember.delete({
+      await db.projectMember.delete({
         where: { userId_projectId: { userId, projectId } },
       });
     } catch (error) {
@@ -202,6 +192,42 @@ export class ProjectRepository extends BaseRepository<
         throw AppError.notFound("Membership record not found.");
       }
       this.handleError(error, "Failed to remove project member.");
+    }
+  }
+
+  async createWithOwner(
+    data: ProjectCreateInput,
+    userId: string
+  ): Promise<IProject> {
+    try {
+      return await db.$transaction(async (tx) => {
+        const project = await tx.project.create({ data });
+
+        await tx.projectMember.create({
+          data: {
+            project: { connect: { id: project.id } },
+            user: { connect: { id: userId } },
+            role: Role.ADMIN,
+          },
+        });
+
+        return project as IProject;
+      });
+    } catch (error) {
+      this.handleError(error, "Failed to create project.");
+    }
+  }
+
+  async getAdminCount(projectId: string): Promise<number> {
+    try {
+      return await db.projectMember.count({
+        where: {
+          projectId,
+          role: Role.ADMIN,
+        },
+      });
+    } catch (error) {
+      this.handleError(error, "Failed to count project admins.");
     }
   }
 

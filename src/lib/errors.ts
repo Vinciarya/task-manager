@@ -2,8 +2,8 @@
  * Custom application error class for handled and unhandled exceptions.
  */
 export class AppError extends Error {
-  public readonly statusCode: number;
-  public readonly isOperational: boolean;
+  readonly statusCode: number;
+  readonly isOperational: boolean;
 
   constructor(message: string, statusCode: number, isOperational = true) {
     super(message);
@@ -43,6 +43,16 @@ export class AppError extends Error {
   /** 409 - Conflict */
   static conflict(message = "The request could not be completed due to a conflict with the current state of the resource."): AppError {
     return new AppError(message, 409);
+  }
+
+  /** 422 - Unprocessable Entity */
+  static unprocessable(message = "The request was well-formed but could not be processed."): AppError {
+    return new AppError(message, 422);
+  }
+
+  /** 503 - Service Unavailable */
+  static serviceUnavailable(message = "The service is temporarily unavailable. Please retry later."): AppError {
+    return new AppError(message, 503);
   }
 
   /** 500 - Internal Server Error */

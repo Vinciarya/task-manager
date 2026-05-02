@@ -77,8 +77,9 @@ export const updateStatusSchema = z.object({
 
 export const taskFilterSchema = z.object({
   projectId: z
-    .string({ error: "Project ID is required." })
-    .cuid("Project ID must be a valid CUID."),
+    .string()
+    .cuid("Project ID must be a valid CUID.")
+    .optional(),
 
   status: z
     .enum([TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.DONE], {

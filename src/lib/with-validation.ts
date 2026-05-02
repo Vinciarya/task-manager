@@ -66,7 +66,8 @@ export function withValidation<TSchema extends ZodSchema>(schema: TSchema) {
       // JSON.stringify is safe here since Zod output only contains
       // serialisable primitives + objects.
       const headers = new Headers(req.headers);
-      headers.set(PARSED_BODY_HEADER, JSON.stringify(parsed));
+      // Use encodeURIComponent to support non-Latin1 characters (like emojis) in headers
+      headers.set(PARSED_BODY_HEADER, encodeURIComponent(JSON.stringify(parsed)));
 
       const enrichedReq = new NextRequest(req.url, {
         method: req.method,
@@ -103,5 +104,6 @@ export function getParsedBody<T>(req: NextRequest): T {
     );
   }
 
-  return JSON.parse(raw) as T;
+  // Use decodeURIComponent to reverse the encoding applied in withValidation
+  return JSON.parse(decodeURIComponent(raw)) as T;
 }

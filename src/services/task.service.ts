@@ -18,10 +18,9 @@ export const taskService = {
     if (filters?.projectId) query.append("projectId", filters.projectId);
     if (filters?.status) query.append("status", filters.status);
     if (filters?.priority) query.append("priority", filters.priority);
-    if (filters?.assigneeId) query.append("assigneeId", filters.assigneeId);
-    if (filters?.search) query.append("search", filters.search);
-    if (filters?.isOverdue !== undefined) {
-      query.append("isOverdue", filters.isOverdue.toString());
+    if (filters?.assignedToId) query.append("assignedToId", filters.assignedToId);
+    if (filters?.overdue !== undefined) {
+      query.append("overdue", filters.overdue.toString());
     }
 
     const queryString = query.toString() ? `?${query.toString()}` : "";

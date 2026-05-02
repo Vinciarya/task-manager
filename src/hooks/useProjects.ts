@@ -3,6 +3,7 @@ import { useProjectStore } from "@/store";
 import { projectService } from "@/services";
 import { CreateProjectInput, UpdateProjectInput, AddMemberInput } from "@/modules/project/project.schema";
 import { IProjectWithMeta } from "@/types";
+import { getErrorMessage } from "@/lib/error-message";
 
 export function useProjects() {
   const {
@@ -25,8 +26,8 @@ export function useProjects() {
       if (response.success && response.data) {
         setProjects(response.data.items);
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch projects");
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, "Failed to fetch projects"));
     } finally {
       setLoading(false);
     }
@@ -36,7 +37,7 @@ export function useProjects() {
     fetchProjects();
   }, [fetchProjects]);
 
-  const createProject = async (data: CreateProjectInput) => {
+  const createProject = async (data: CreateProjectInput): Promise<IProjectWithMeta | null> => {
     const tempId = `temp-project-${Date.now()}`;
     const tempProject: IProjectWithMeta = {
       id: tempId,
@@ -66,19 +67,22 @@ export function useProjects() {
         addProject(realProject);
         return realProject;
       }
-    } catch (err: any) {
+
       removeProject(tempId);
-      setError(err.message || "Failed to create project");
-      throw err;
+      return null;
+    } catch (error: unknown) {
+      removeProject(tempId);
+      setError(getErrorMessage(error, "Failed to create project"));
+      throw error;
     }
   };
 
-  const updateProject = async (id: string, data: UpdateProjectInput) => {
+  const updateProject = async (id: string, data: UpdateProjectInput): Promise<void> => {
     const previousProject = projects.find(p => p.id === id);
     if (!previousProject) return;
 
     // Optimistic UI update
-    updateProjectInStore(id, data);
+    updateProjectInStore(id, getDefinedProjectUpdates(data));
     setError(null);
 
     try {
@@ -86,15 +90,15 @@ export function useProjects() {
       if (!response.success) {
         throw new Error(response.message);
       }
-    } catch (err: any) {
+    } catch (error: unknown) {
       // Revert on failure
       updateProjectInStore(id, previousProject);
-      setError(err.message || "Failed to update project");
-      throw err;
+      setError(getErrorMessage(error, "Failed to update project"));
+      throw error;
     }
   };
 
-  const deleteProject = async (id: string) => {
+  const deleteProject = async (id: string): Promise<void> => {
     const previousProject = projects.find(p => p.id === id);
     if (!previousProject) return;
 
@@ -107,23 +111,23 @@ export function useProjects() {
       if (!response.success) {
         throw new Error(response.message);
       }
-    } catch (err: any) {
+    } catch (error: unknown) {
       // Revert on failure
       addProject(previousProject);
-      setError(err.message || "Failed to delete project");
-      throw err;
+      setError(getErrorMessage(error, "Failed to delete project"));
+      throw error;
     }
   };
 
-  const addMember = async (projectId: string, data: AddMemberInput) => {
+  const addMember = async (projectId: string, data: AddMemberInput): Promise<void> => {
     try {
       const response = await projectService.addMember(projectId, data);
       if (response.success) {
-        fetchProjects(); // Refresh projects list to update member counts
+        await fetchProjects(); // Refresh projects list to update member counts
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to add member");
-      throw err;
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, "Failed to add member"));
+      throw error;
     }
   };
 
@@ -137,4 +141,18 @@ export function useProjects() {
     addMember,
     refreshProjects: fetchProjects
   };
+}
+
+function getDefinedProjectUpdates(data: UpdateProjectInput): Partial<IProjectWithMeta> {
+  const updates: Partial<IProjectWithMeta> = {};
+
+  if (data.name !== undefined) {
+    updates.name = data.name;
+  }
+
+  if (data.description !== undefined) {
+    updates.description = data.description;
+  }
+
+  return updates;
 }

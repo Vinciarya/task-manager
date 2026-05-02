@@ -1,13 +1,18 @@
 import { ApiResponse } from "@/types";
 
 export class ApiError extends Error {
+  readonly statusCode: number;
+  readonly data: unknown;
+
   constructor(
-    public message: string,
-    public statusCode: number,
-    public data: unknown = null
+    message: string,
+    statusCode: number,
+    data: unknown = null
   ) {
     super(message);
     this.name = "ApiError";
+    this.statusCode = statusCode;
+    this.data = data;
   }
 }
 
@@ -55,7 +60,7 @@ export async function request<T>(
       if (cookieHeader) {
         headers.set("cookie", cookieHeader);
       }
-    } catch (e) {
+    } catch {
       // Ignore if not running in a context where next/headers is available
     }
   }
@@ -63,7 +68,7 @@ export async function request<T>(
   try {
     const response = await fetch(url, fetchOptions);
 
-    let data: any;
+    let data: unknown;
     const isJson = response.headers.get("content-type")?.includes("application/json");
 
     if (isJson) {
@@ -72,9 +77,9 @@ export async function request<T>(
 
     if (!response.ok) {
       throw new ApiError(
-        data?.message || response.statusText || "An error occurred",
+        getResponseMessage(data, response.statusText || "An error occurred"),
         response.status,
-        data?.data
+        getResponseData(data)
       );
     }
 
@@ -98,4 +103,21 @@ export async function request<T>(
       500
     );
   }
+}
+
+function getResponseMessage(data: unknown, fallback: string): string {
+  if (typeof data !== "object" || data === null || !("message" in data)) {
+    return fallback;
+  }
+
+  const message = data.message;
+  return typeof message === "string" && message.length > 0 ? message : fallback;
+}
+
+function getResponseData(data: unknown): unknown {
+  if (typeof data !== "object" || data === null || !("data" in data)) {
+    return null;
+  }
+
+  return data.data;
 }

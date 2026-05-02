@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
-import { Prisma } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { AppError } from "@/lib/errors";
 import type { ApiResponse as ApiResponseShape } from "@/types";
 
@@ -34,7 +34,6 @@ export class ApiResponse {
    * Pass `status` to override (e.g. 201 via `created`).
    */
   static success<T>(
-    _res: NextResponse,
     data: T,
     message: string,
     status = 200
@@ -46,17 +45,16 @@ export class ApiResponse {
    * 201 Created — convenience wrapper around `success`.
    */
   static created<T>(
-    res: NextResponse,
     data: T,
     message: string
   ): NextResponse<ApiResponseShape<T>> {
-    return ApiResponse.success(res, data, message, 201);
+    return ApiResponse.success(data, message, 201);
   }
 
   /**
    * 204 No Content — body intentionally empty; typed as `null`.
    */
-  static noContent(_res: NextResponse): NextResponse<ApiResponseShape<null>> {
+  static noContent(): NextResponse<ApiResponseShape<null>> {
     return buildResponse<null>(true, 204, "No content.", null);
   }
 
@@ -84,7 +82,7 @@ export class ApiResponse {
     }
 
     // ── Prisma known request errors ───────────────────────────────────────
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error instanceof PrismaClientKnownRequestError) {
       switch (error.code) {
         case "P2002": {
           // meta.target is string[] of field names that violated the unique constraint
@@ -127,7 +125,7 @@ export class ApiResponse {
       const fieldErrors = error.flatten().fieldErrors;
 
       const message = Object.entries(fieldErrors)
-        .map(([field, messages]) => `${field}: ${(messages ?? []).join(", ")}`)
+        .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(", ") : ""}`)
         .join(" | ");
 
       return buildResponse<null>(
@@ -139,10 +137,6 @@ export class ApiResponse {
     }
 
     // ── Unknown / unexpected errors ───────────────────────────────────────
-    if (process.env.NODE_ENV === "development") {
-      console.error("[ApiResponse.error] Unhandled error:", error);
-    }
-
     const message =
       process.env.NODE_ENV === "development" && error instanceof Error
         ? error.message
