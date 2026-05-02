@@ -133,11 +133,20 @@ export class ProjectService implements IProjectService {
       throw AppError.conflict("This user is already a member of the project.");
     }
 
-    return this.#repository.addMember({
+    const member = await this.#repository.addMember({
       project: { connect: { id: projectId } },
       user: { connect: { id: targetUser.id } },
       role,
     } satisfies Prisma.ProjectMemberCreateInput);
+
+    return {
+      ...member,
+      user: {
+        id: targetUser.id,
+        name: targetUser.name,
+        email: targetUser.email,
+      }
+    } as any;
   }
 
   async removeMember(

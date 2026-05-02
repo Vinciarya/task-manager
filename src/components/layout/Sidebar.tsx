@@ -22,23 +22,7 @@ import { Role } from '@/types';
 
 // ─── Logo ────────────────────────────────────────────────────────────────────
 
-function Logo() {
-  return (
-    <Link
-      href="/dashboard"
-      className="relative z-20 flex items-center gap-2 py-1 text-sm font-normal"
-    >
-      <CheckSquare className="h-5 w-6 shrink-0 text-indigo-500 dark:text-indigo-400" />
-      <motion.span
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="whitespace-pre font-bold text-neutral-900 dark:text-white tracking-tight text-lg font-heading"
-      >
-        TaskFlow
-      </motion.span>
-    </Link>
-  );
-}
+
 
 // ─── Navigation items ─────────────────────────────────────────────────────────
 
@@ -109,7 +93,7 @@ export function Sidebar() {
       <SidebarBody className="bg-slate-50/50 dark:bg-neutral-950 backdrop-blur-xl border-r border-slate-200/50 dark:border-neutral-800">
         {/* Top section */}
         <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
-          <Logo />
+       
 
           <nav className="mt-8 flex flex-col gap-1">
             {NAV_ITEMS.map((item) => (
