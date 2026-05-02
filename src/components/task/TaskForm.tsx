@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Card,
   CardContent,
@@ -126,14 +127,14 @@ export function TaskForm({ isOpen, onClose, task, projectId, projectMembers, onS
 
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="description">Description</Label>
-              <textarea
+              <Textarea
                 id="description"
                 rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm resize-none"
                 placeholder="Details..."
                 disabled={isLoading}
+                className="resize-none"
               />
               {validationErrors.description && <p className="text-sm text-red-600">{validationErrors.description[0]}</p>}
             </div>

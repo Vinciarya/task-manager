@@ -1,10 +1,11 @@
 import { TaskPriority } from '@/types';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 const priorityVariants: Record<TaskPriority, string> = {
-  [TaskPriority.LOW]: 'bg-transparent text-green-700 border-green-500',
-  [TaskPriority.MEDIUM]: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  [TaskPriority.HIGH]: 'bg-red-100 text-red-800 border-red-200',
+  [TaskPriority.LOW]: 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100',
+  [TaskPriority.MEDIUM]: 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100',
+  [TaskPriority.HIGH]: 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100',
 };
 
 const priorityLabels: Record<TaskPriority, string> = {
@@ -20,14 +21,15 @@ interface PriorityBadgeProps {
 
 export function PriorityBadge({ priority, className }: PriorityBadgeProps) {
   return (
-    <span
+    <Badge
+      variant="outline"
       className={cn(
-        'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border',
+        'font-bold tracking-tight px-2 py-0.5 rounded-md border',
         priorityVariants[priority],
         className
       )}
     >
       {priorityLabels[priority]}
-    </span>
+    </Badge>
   );
 }

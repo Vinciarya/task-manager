@@ -1,6 +1,17 @@
 'use client';
 
 import { TaskStatus, TaskPriority } from '@/types';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Filter, Users, CalendarDays, AlertCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export interface TaskFilterValues {
   status?: TaskStatus;
@@ -21,71 +32,88 @@ export function TaskFilters({ filters, onChange, projectMembers }: TaskFiltersPr
     key: keyof TaskFilterValues,
     value: TaskFilterValues[keyof TaskFilterValues] | ''
   ) => {
-    onChange({ ...filters, [key]: value || undefined, page: 1 });
+    onChange({ ...filters, [key]: value === '' ? undefined : value, page: 1 });
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex flex-wrap gap-4 items-end">
-      <div className="w-full sm:w-auto flex-1 min-w-[150px]">
-        <label htmlFor="status-filter" className="block text-xs font-medium text-gray-700 mb-1">Status</label>
-        <select
-          id="status-filter"
-          value={filters.status || ''}
-          onChange={(e) => handleChange('status', e.target.value as TaskStatus | '')}
-          className="block w-full rounded-md border-0 py-1.5 pl-3 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+    <div className="bg-white/80 backdrop-blur-md p-5 rounded-xl shadow-sm border border-gray-100 flex flex-wrap gap-6 items-end">
+      <div className="w-full sm:w-auto flex-1 min-w-[180px]">
+        <Label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-1.5">
+          <Filter className="h-3 w-3" /> Status
+        </Label>
+        <Select
+          value={filters.status || '_all'}
+          onValueChange={(v) => handleChange('status', v === '_all' ? '' : v as TaskStatus)}
         >
-          <option value="">All Statuses</option>
-          <option value={TaskStatus.TODO}>To Do</option>
-          <option value={TaskStatus.IN_PROGRESS}>In Progress</option>
-          <option value={TaskStatus.DONE}>Done</option>
-        </select>
+          <SelectTrigger className="h-9 font-medium tracking-tight border-gray-200">
+            <SelectValue placeholder="All Statuses" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="_all">All Statuses</SelectItem>
+            <SelectItem value={TaskStatus.TODO}>To Do</SelectItem>
+            <SelectItem value={TaskStatus.IN_PROGRESS}>In Progress</SelectItem>
+            <SelectItem value={TaskStatus.DONE}>Done</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      <div className="w-full sm:w-auto flex-1 min-w-[150px]">
-        <label htmlFor="priority-filter" className="block text-xs font-medium text-gray-700 mb-1">Priority</label>
-        <select
-          id="priority-filter"
-          value={filters.priority || ''}
-          onChange={(e) => handleChange('priority', e.target.value as TaskPriority | '')}
-          className="block w-full rounded-md border-0 py-1.5 pl-3 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+      <div className="w-full sm:w-auto flex-1 min-w-[180px]">
+        <Label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-1.5">
+          <AlertCircle className="h-3 w-3" /> Priority
+        </Label>
+        <Select
+          value={filters.priority || '_all'}
+          onValueChange={(v) => handleChange('priority', v === '_all' ? '' : v as TaskPriority)}
         >
-          <option value="">All Priorities</option>
-          <option value={TaskPriority.LOW}>Low</option>
-          <option value={TaskPriority.MEDIUM}>Medium</option>
-          <option value={TaskPriority.HIGH}>High</option>
-        </select>
+          <SelectTrigger className="h-9 font-medium tracking-tight border-gray-200">
+            <SelectValue placeholder="All Priorities" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="_all">All Priorities</SelectItem>
+            <SelectItem value={TaskPriority.LOW}>Low</SelectItem>
+            <SelectItem value={TaskPriority.MEDIUM}>Medium</SelectItem>
+            <SelectItem value={TaskPriority.HIGH}>High</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {projectMembers && (
-        <div className="w-full sm:w-auto flex-1 min-w-[150px]">
-          <label htmlFor="assignee-filter" className="block text-xs font-medium text-gray-700 mb-1">Assignee</label>
-          <select
-            id="assignee-filter"
-            value={filters.assignedToId || ''}
-            onChange={(e) => handleChange('assignedToId', e.target.value)}
-            className="block w-full rounded-md border-0 py-1.5 pl-3 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+        <div className="w-full sm:w-auto flex-1 min-w-[180px]">
+          <Label className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-1.5">
+            <Users className="h-3 w-3" /> Assignee
+          </Label>
+          <Select
+            value={filters.assignedToId || '_all'}
+            onValueChange={(v) => handleChange('assignedToId', v === '_all' ? '' : v)}
           >
-            <option value="">Anyone</option>
-            {projectMembers.map(m => (
-              <option key={m.user.id} value={m.user.id}>
-                {m.user.name || m.user.email}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="h-9 font-medium tracking-tight border-gray-200">
+              <SelectValue placeholder="Anyone" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="_all">Anyone</SelectItem>
+              {projectMembers.map(m => (
+                <SelectItem key={m.user.id} value={m.user.id}>
+                  {m.user.name || m.user.email}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )}
 
-      <div className="w-full sm:w-auto flex items-center h-[36px]">
-        <label className="relative inline-flex items-center cursor-pointer">
-          <input 
-            type="checkbox" 
-            className="sr-only peer"
-            checked={filters.overdue || false}
-            onChange={(e) => handleChange('overdue', e.target.checked)}
-          />
-          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
-          <span className="ms-3 text-sm font-medium text-gray-700">Overdue Only</span>
-        </label>
+      <div className="w-full sm:w-auto flex items-center gap-3 h-9 px-4 rounded-md border border-gray-100 bg-gray-50/50">
+        <Switch
+          id="overdue-filter"
+          checked={filters.overdue || false}
+          onCheckedChange={(checked) => handleChange('overdue', checked)}
+        />
+        <Label 
+          htmlFor="overdue-filter" 
+          className="text-sm font-bold tracking-tight text-gray-700 cursor-pointer select-none flex items-center gap-1.5"
+        >
+          <CalendarDays className={cn("h-4 w-4", filters.overdue ? "text-red-500" : "text-gray-400")} />
+          Overdue Only
+        </Label>
       </div>
     </div>
   );

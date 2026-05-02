@@ -12,6 +12,12 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface ProjectCardProps {
   project: IProjectWithMeta;
@@ -21,7 +27,6 @@ interface ProjectCardProps {
 export function ProjectCard({ project, onEdit }: ProjectCardProps) {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === Role.ADMIN;
-  const [showMenu, setShowMenu] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const removeProject = useProjectStore((s) => s.removeProject);
 
@@ -44,35 +49,25 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
           {/* Title row + menu */}
           <div className="flex justify-between items-start mb-2 relative">
             <Link href={`/projects/${project.id}`} className="hover:underline flex-1">
-              <h3 className="text-xl font-bold text-gray-900 truncate tracking-tight">{project.name}</h3>
+              <h3 className="text-xl font-bold text-gray-900 truncate tracking-tight font-heading">{project.name}</h3>
             </Link>
 
             {isAdmin && (
-              <div className="relative ml-2">
-                <button
-                  onClick={() => setShowMenu(!showMenu)}
-                  onBlur={() => setTimeout(() => setShowMenu(false), 200)}
-                  className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
-                >
-                  <MoreVertical className="h-5 w-5" />
-                </button>
-                {showMenu && (
-                  <div className="absolute right-0 mt-1 w-36 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
-                    <button
-                      onClick={() => { setShowMenu(false); onEdit?.(project); }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                    >
-                      <Edit2 className="h-4 w-4 mr-2" /> Edit
-                    </button>
-                    <button
-                      onClick={() => { setShowMenu(false); setShowDelete(true); }}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" /> Delete
-                    </button>
-                  </div>
-                )}
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors outline-none">
+                    <MoreVertical className="h-5 w-5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuItem onClick={() => onEdit?.(project)} className="cursor-pointer">
+                    <Edit2 className="h-4 w-4 mr-2" /> Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowDelete(true)} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
+                    <Trash2 className="h-4 w-4 mr-2" /> Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
 

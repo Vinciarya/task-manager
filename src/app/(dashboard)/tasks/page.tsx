@@ -11,6 +11,13 @@ import { CheckSquare } from 'lucide-react';
 import { TaskStatus } from '@/types';
 import { PriorityBadge } from '@/components/shared/PriorityBadge';
 import { Pagination } from '@/components/shared/Pagination';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import Link from 'next/link';
 import type { TaskFilterValues } from '@/components/task/TaskFilters';
 
@@ -90,16 +97,20 @@ export default function TasksPage() {
                       </Link>
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      <select
+                      <Select
                         value={task.status}
-                        onChange={(e) => handleStatusChange(task.id, e.target.value as TaskStatus)}
-                        className="rounded-md border-0 py-1 pl-2 pr-8 text-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 bg-transparent cursor-pointer"
+                        onValueChange={(v) => handleStatusChange(task.id, v as TaskStatus)}
                         disabled={isLoading}
                       >
-                        <option value={TaskStatus.TODO}>To Do</option>
-                        <option value={TaskStatus.IN_PROGRESS}>In Progress</option>
-                        <option value={TaskStatus.DONE}>Done</option>
-                      </select>
+                        <SelectTrigger className="w-[130px] h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value={TaskStatus.TODO}>To Do</SelectItem>
+                          <SelectItem value={TaskStatus.IN_PROGRESS}>In Progress</SelectItem>
+                          <SelectItem value={TaskStatus.DONE}>Done</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <PriorityBadge priority={task.priority} />

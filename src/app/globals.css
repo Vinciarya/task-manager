@@ -7,10 +7,12 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Source Serif 4", "Crimson Pro", ui-serif, Georgia, serif;
+  --font-heading: "Space Grotesk", sans-serif;
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
+  /* ... (rest of the theme variables) ... */
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-accent: var(--sidebar-accent);
@@ -47,6 +49,66 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 }
+
+/* User Requested Font Classes */
+.roboto-flex-premium {
+  font-family: "Roboto Flex", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0,
+    "wdth" 100,
+    "GRAD" 0,
+    "XOPQ" 96,
+    "XTRA" 468,
+    "YOPQ" 79,
+    "YTAS" 750,
+    "YTDE" -203,
+    "YTFI" 738,
+    "YTLC" 514,
+    "YTUC" 712;
+}
+
+.dm-sans-premium {
+  font-family: "DM Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.source-serif-4-premium {
+  font-family: "Source Serif 4", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.crimson-pro-premium {
+  font-family: "Crimson Pro", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.space-grotesk-premium {
+  font-family: "Space Grotesk", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.titillium-web-extralight { font-family: "Titillium Web", sans-serif; font-weight: 200; font-style: normal; }
+.titillium-web-light { font-family: "Titillium Web", sans-serif; font-weight: 300; font-style: normal; }
+.titillium-web-regular { font-family: "Titillium Web", sans-serif; font-weight: 400; font-style: normal; }
+.titillium-web-semibold { font-family: "Titillium Web", sans-serif; font-weight: 600; font-style: normal; }
+.titillium-web-bold { font-family: "Titillium Web", sans-serif; font-weight: 700; font-style: normal; }
+.titillium-web-black { font-family: "Titillium Web", sans-serif; font-weight: 900; font-style: normal; }
+.titillium-web-extralight-italic { font-family: "Titillium Web", sans-serif; font-weight: 200; font-style: italic; }
+.titillium-web-light-italic { font-family: "Titillium Web", sans-serif; font-weight: 300; font-style: italic; }
+.titillium-web-regular-italic { font-family: "Titillium Web", sans-serif; font-weight: 400; font-style: italic; }
+.titillium-web-semibold-italic { font-family: "Titillium Web", sans-serif; font-weight: 600; font-style: italic; }
+.titillium-web-bold-italic { font-family: "Titillium Web", sans-serif; font-weight: 700; font-style: italic; }
 
 input, textarea, select {
   color: #000000 !important;
@@ -127,6 +189,7 @@ input, textarea, select {
   }
   body {
     @apply bg-background text-foreground antialiased selection:bg-indigo-100 selection:text-indigo-900;
+    font-family: "DM Sans", sans-serif;
     font-feature-settings: "ss01", "ss02", "cv01", "cv11";
   }
   html {
@@ -137,6 +200,7 @@ input, textarea, select {
   /* Premium Bold Headings */
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold tracking-tight text-foreground;
+    font-family: "Space Grotesk", sans-serif;
   }
 
   h1 { @apply text-4xl sm:text-5xl lg:text-6xl; }

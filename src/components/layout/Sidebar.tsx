@@ -32,7 +32,7 @@ function Logo() {
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="whitespace-pre font-bold text-neutral-900 dark:text-white tracking-tight text-lg"
+        className="whitespace-pre font-bold text-neutral-900 dark:text-white tracking-tight text-lg font-heading"
       >
         TaskFlow
       </motion.span>

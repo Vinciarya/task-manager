@@ -12,6 +12,12 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface TaskCardProps {
   task: ITask;
@@ -29,7 +35,6 @@ export function TaskCard({ task, onEdit, onDelete, userRoleInProject, onClick, c
   const isCreator = task.createdById === currentUserId;
   const canEditOrDelete = isAdmin || isCreator;
 
-  const [showMenu, setShowMenu] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -70,31 +75,24 @@ export function TaskCard({ task, onEdit, onDelete, userRoleInProject, onClick, c
             </div>
 
             {canEditOrDelete && (
-              <div className="relative" onClick={(e) => e.stopPropagation()}>
-                <button
-                  onClick={() => setShowMenu(!showMenu)}
-                  onBlur={() => setTimeout(() => setShowMenu(false), 200)}
-                  className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <MoreVertical className="h-4 w-4" />
-                </button>
-                {showMenu && (
-                  <div className="absolute right-0 mt-1 w-32 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
-                    <button
-                      onClick={() => { setShowMenu(false); onEdit?.(task); }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                    >
-                      <Edit2 className="h-3 w-3 mr-2" /> Edit
-                    </button>
-                    <button
-                      onClick={() => { setShowMenu(false); setShowDelete(true); }}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
-                    >
-                      <Trash2 className="h-3 w-3 mr-2" /> Delete
-                    </button>
-                  </div>
-                )}
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    onClick={(e) => e.stopPropagation()}
+                    className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity outline-none"
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-32" onClick={(e) => e.stopPropagation()}>
+                  <DropdownMenuItem onClick={() => onEdit?.(task)} className="cursor-pointer">
+                    <Edit2 className="h-3 w-3 mr-2" /> Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowDelete(true)} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
+                    <Trash2 className="h-3 w-3 mr-2" /> Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
 
