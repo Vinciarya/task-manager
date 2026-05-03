@@ -5,7 +5,7 @@
 <h1 align="center">TaskFlow — Team Task Manager</h1>
 
 <p align="center">
-  <strong>A production-grade, full-stack team task management application built with Next.js 15, NextAuth v5, Prisma 6, PostgreSQL, and Tailwind CSS.</strong>
+  <strong>A production-grade, full-stack team task management application built with Next.js 16, NextAuth v5, Prisma 6, PostgreSQL, and Tailwind CSS.</strong>
 </p>
 
 <p align="center">
