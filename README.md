@@ -74,7 +74,7 @@
 
 | Layer | Technology |
 |-------|-----------|
-| **Framework** | Next.js 15 (App Router, TypeScript strict) |
+| **Framework** | Next.js 16 (App Router, TypeScript strict) |
 | **Authentication** | NextAuth.js v5 — Credentials Provider, JWT strategy |
 | **Database ORM** | Prisma 6 |
 | **Database** | PostgreSQL (Supabase / Railway) |
